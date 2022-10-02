@@ -3,7 +3,7 @@ binarize(x::Real) = x >= 0 ? one(x) : -one(x)
 
 @scalar_rule(binarize(x), one(x) * (abs(x) <= 1))
 
-function rrule(
+function ChainRulesCore.rrule(
     ::typeof(Broadcast.broadcasted),
     ::typeof(binarize),
     x::Union{Numeric,Broadcast.Broadcasted}
@@ -25,7 +25,7 @@ end
 
 @scalar_rule(binarize_stochastic(x), one(x) * (abs(x) <= 1))
 
-function rrule(
+function ChainRulesCore.rrule(
     ::typeof(Broadcast.broadcasted),
     ::typeof(binarize_stochastic),
     x::Union{Numeric,Broadcast.Broadcasted}
