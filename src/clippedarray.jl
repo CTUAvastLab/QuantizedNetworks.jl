@@ -26,7 +26,7 @@ Base.size(c::ClippedArray) = size(c.x)
 Base.length(c::ClippedArray) = length(c.x)
 Base.getindex(c::ClippedArray, args...) = getindex(c.x, args...)
 Base.setindex!(c::ClippedArray, v, args...) = setindex!(c.x, clamp.(v, c.lo, c.hi), args...)
-Base.zero(c::ClippedArray) = Base.zero(c::ClippedArray) = ClippedArray(zero(c.x), c.lo, c.hi)
+Base.zero(c::ClippedArray) = ClippedArray(zero(c.x), c.lo, c.hi)
 
 
 # ChainRulesCore utils
