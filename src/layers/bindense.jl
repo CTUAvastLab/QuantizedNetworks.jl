@@ -1,20 +1,22 @@
-struct BinDense{M<:ClippedMatrix,B,F}
+struct BinDense{M<:ClippedMatrix,F}
     weight::M
-    batchnorm::B
-    bin::F
+    quantizer::F
 end
 
-function BinDense((in, out)::Pair{<:Integer,<:Integer}; bin=binarize, init = glorot_uniform)
-    W = ClippedArray(2 .* init(out, in) .- 1)
-    B = BatchNorm(out)
-    return BinDense(W, B, bin)
+function BinDense(
+    (in, out)::Pair{<:Integer,<:Integer};
+    quantizer=binarize,
+    init = glorot_uniform
+)
+
+    return BinDense(ClippedArray(init(out, in)), quantizer)
 end
 
 @functor BinDense
 
 function (l::BinDense)(x::AbstractVecOrMat)
-    Wbin = l.bin.(l.weight)
-    return hardtanh.(l.batchnorm(Wbin * x))
+    Wbin = l.quantizer.(l.weight)
+    return l.quantizer.(Wbin * x)
 end
 
 function (l::BinDense)(x::AbstractArray)
@@ -23,6 +25,5 @@ end
 
 function Base.show(io::IO, l::BinDense)
     print(io, "BinDense(", size(l.weight, 2), " => ", size(l.weight, 1))
-    l.batchnorm == identity || print(io, ", ", l.batchnorm)
     print(io, ")")
 end
