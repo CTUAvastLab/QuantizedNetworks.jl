@@ -73,8 +73,8 @@ struct SwishSign{T} <: Quantizer
     β::T
 
     function SwishSign(β::T = 5) where {T<:Real}
-        threshold > 0 || throw(ArgumentError("`β` must be positive"))
-        return new{T}(threshold)
+        β > 0 || throw(ArgumentError("`β` must be positive"))
+        return new{T}(β)
     end
 end
 
