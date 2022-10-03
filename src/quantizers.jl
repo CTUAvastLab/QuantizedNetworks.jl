@@ -21,52 +21,65 @@ function value end
 """
     deriv(q::Quantizer, x::Real)
 
-Returns gradient of `q` with respect to `x` 
+Returns gradient of `q` with respect to `x`
 """
 function deriv end
 
 """
-    Sign(lo, hi, threshold)
+    Sign(threshold::Real = 1)
 
-deterministic binary quantizer that return `lo` when the given input is less than zero and `hi` otherwise.
-
-# TODO:
-- better description of input arguments and rrule implementation
+deterministic binary quantizer that return -1 when the given input is less than zero and 1 otherwise. The gradient is estimated using the Straight-Through Estimator (essentially the
+binarization is replaced by a clipped identity on the backward pass).
 
 # References
 
-- [Binarized Neural Networks: Training Deep Neural Networks with Weights and Activations Constrained to +1 or -1](https://arxiv.org/abs/1602.02830)
-
-# Examples
-```julia
-julia> q = Sign()
-Sign{Int64}(-1, 1, 1)
-
-julia> value.(q, [-2, 0.5, 2])
-3-element Vector{Float64}:
- -1.0
-  1.0
-  1.0
-```
+- [`Binarized Neural Networks: Training Deep Neural Networks with Weights and Activations Constrained to +1 or -1`](https://arxiv.org/abs/1602.02830)
 """
 struct Sign{T} <: Quantizer
-    lo::T
-    hi::T
     threshold::T
 
-    Sign(lo::Real, hi::Real, threshold::Real) = Sign(promote(lo, hi, threshold)...)
-
-    function Sign(lo::T, hi::T, threshold::T) where {T<:Real}
-        lo < hi || throw(ArgumentError("`lo` must be less than `hi`"))
+    function Sign(threshold::T = 1) where {T<:Real}
         threshold > 0 || throw(ArgumentError("`threshold` must be positive"))
-        return new{T}(lo, hi, threshold)
+        return new{T}(threshold)
     end
 end
 
-Sign(; lo::Real=-1, hi::Real=1, threshold::Real=1) = Sign(lo, hi, threshold)
-
-value(q::Sign, x::T) where {T<:Real} = ifelse(x < 0, T(q.lo), T(q.hi))
+value(::Sign, x::Real) = ifelse(x < 0, -one(x), one(x))
 deriv(q::Sign, x::T) where {T<:Real} = T(abs(x) <= q.threshold)
 
+"""
+    PolySign(threshold::Real = 1)
 
+TODO
+"""
+struct PolySign{T} <: Quantizer
+    threshold::T
 
+    function PolySign(threshold::T = 1) where {T<:Real}
+        threshold > 0 || throw(ArgumentError("`threshold` must be positive"))
+        return new{T}(threshold)
+    end
+end
+
+value(::PolySign, x::Real) = ifelse(x < 0, -one(x), one(x))
+deriv(q::PolySign, x::T) where {T<:Real} = T((2 - 2abs(x)) * (abs(x) <= q.threshold))
+
+"""
+    SwishSign(lo, hi, threshold)
+
+TODO
+"""
+struct SwishSign{T} <: Quantizer
+    β::T
+
+    function SwishSign(β::T = 5) where {T<:Real}
+        threshold > 0 || throw(ArgumentError("`β` must be positive"))
+        return new{T}(threshold)
+    end
+end
+
+value(::SwishSign, x::Real) = ifelse(x < 0, -one(x), one(x))
+function deriv(q::SwishSign, x::T) where {T<:Real}
+    β = q.β
+    return T((β*(2 - β*x*tanh((β*x)/2)))/(1 + cosh(β * x)))
+end
