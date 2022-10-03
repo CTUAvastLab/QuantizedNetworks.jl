@@ -11,6 +11,6 @@ function Flux.Optimise.apply!(b::Bop, x, Δ)
     mt = get!(() -> zero(x), b.momentum, x)::typeof(x)
 
     @. mt = (1 - ρ) * mt + ρ * Δ
-
-    return @. ifelse(abs(mt) > τ && sign(mt) == sign(Δ), -one(x), one(x))
+    @. Δ = ifelse(abs(mt) > τ && sign(mt) == sign(Δ), -one(x), one(x))
+    return Δ
 end
