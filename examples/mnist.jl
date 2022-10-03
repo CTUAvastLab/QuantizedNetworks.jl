@@ -3,7 +3,6 @@ using Revise
 using BinNN
 using BinNN.Flux
 using MLDatasets
-using ProgressMeter
 
 using BinNN.Flux.Data: DataLoader
 using BinNN.Flux: onehotbatch, onecold
@@ -15,7 +14,7 @@ ENV["DATADEPS_ALWAYS_ACCEPT"] = "true"
 batchsize = 256
 imgsize = (28, 28, 1)
 nclasses = 10
-epochs = 10
+epochs = 30
 
 function loss_and_accuracy(data_loader, model)
     acc = 0
@@ -40,26 +39,38 @@ xtest, ytest = MLDatasets.MNIST(:test)[:]
 test = (Flux.flatten(xtest), onehotbatch(ytest, 0:9))
 test_loader = DataLoader(test; batchsize)
 
+
+weight_lims = (-1, 1)
+input_quantizer = identity
+weight_quantizer = SwishSign()
+
 model = Chain(
-    BinDense(prod(imgsize) => 32),
-    BinDense(32 => nclasses; quantizer=identity),
+    QuantDense(prod(imgsize) => 32; input_quantizer, weight_quantizer, weight_lims),
+    QuantDense(32 => nclasses; input_quantizer, weight_quantizer, weight_lims),
 )
 
 ps = Flux.params(model)
-opt = ADAM(3e-4)
+opt = ADAM(3f-4)
 
 ## Training
+train_loss, train_acc = loss_and_accuracy(train_loader, model)
+test_loss, test_acc = loss_and_accuracy(test_loader, model)
+println("Initialization:")
+println("  train_loss = $train_loss, train_accuracy = $train_acc")
+println("  test_loss = $test_loss, test_accuracy = $test_acc")
+
 for epoch in 1:epochs
-    @info "Epoch $epoch:"
-    @showprogress for (x, y) in train_loader
+    for (x, y) in train_loader
         gs = gradient(() -> logitcrossentropy(model(x), y), ps)
         update!(opt, ps, gs)
     end
 
     ## Report on train and test
-    train_loss, train_acc = loss_and_accuracy(train_loader, model)
-    test_loss, test_acc = loss_and_accuracy(test_loader, model)
-    println("Epoch=$epoch")
-    println("  train_loss = $train_loss, train_accuracy = $train_acc")
-    println("  test_loss = $test_loss, test_accuracy = $test_acc")
+    if epoch % 5 == 0 || epoch == 1
+        train_loss, train_acc = loss_and_accuracy(train_loader, model)
+        test_loss, test_acc = loss_and_accuracy(test_loader, model)
+        println("Epoch=$epoch")
+        println("  train_loss = $train_loss, train_accuracy = $train_acc")
+        println("  test_loss = $test_loss, test_accuracy = $test_acc")
+    end
 end
