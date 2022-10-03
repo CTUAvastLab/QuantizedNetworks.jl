@@ -1,15 +1,16 @@
-struct Bop{T} <: AbstractRule
+struct Bop{T} <: AbstractOptimiser
     rho::T
     threshold::T
+    momentum::IdDict
 end
 
-Bop(ρ = 1e-4, τ = 1f-8) = Bop{typeof(ρ)}(ρ, τ)
-Optimisers.init(o::Bop, x::AbstractArray) = (zero(x), )
+Bop(ρ = 1f-4, τ = 1f-8, momentum = IdDict()) = Bop{typeof(ρ)}(ρ, τ, momentum)
 
-function Optimisers.apply!(b::Bop, state, x, dx)
+function Flux.Optimise.apply!(b::Bop, x, Δ)
     ρ, τ = b.rho, b.threshold
-    mt, = state
-    @.. mt = (1 - ρ) * mt + ρ * dx
+    mt = get!(() -> zero(x), b.momentum, x)::typeof(x)
 
-    return (mt, ), @lazy ifelse(abs(mt) > τ && sign(mt) == sign(dx), -1, 1)
+    @. mt = (1 - ρ) * mt + ρ * Δ
+
+    return @. ifelse(abs(mt) > τ && sign(mt) == sign(Δ), -one(x), one(x))
 end

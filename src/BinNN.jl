@@ -4,12 +4,11 @@ using Distributions
 using ChainRulesCore
 using Flux
 using NNlib
-using Optimisers
 
 using ChainRulesCore: rrule, @scalar_rule, NoTangent, ProjectTo
 using Flux: glorot_uniform, @functor, _create_bias
 using NNlib: hardtanh
-using Optimisers: AbstractRule, @.., @lazy
+using Flux.Optimise: AbstractOptimiser
 
 export ClippedArray
 export value, deriv
