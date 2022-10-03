@@ -4,19 +4,22 @@ using Distributions
 using ChainRulesCore
 using Flux
 using NNlib
+using Optimisers
 
-using Base.Broadcast: broadcasted
 using ChainRulesCore: rrule, @scalar_rule, NoTangent, ProjectTo
-using Flux: glorot_uniform, @functor, BatchNorm
+using Flux: glorot_uniform, @functor, _create_bias
 using NNlib: hardtanh
+using Optimisers: AbstractRule, @.., @lazy
 
-export binarize, binarize_stochastic
-export ClippedArray, BinDense
+export ClippedArray
+export value, deriv
+export Quantizer, Sign, PolySign
+export QuantDense
+export Bop
 
-const Numeric = Union{AbstractArray{<:T},T} where {T<:Number}
-
-include("binarization.jl")
 include("clippedarray.jl")
-include("layers/bindense.jl")
+include("quantizers.jl")
+include("layers/quantdense.jl")
+include("optimisers/bop.jl")
 
 end # module BinNN
