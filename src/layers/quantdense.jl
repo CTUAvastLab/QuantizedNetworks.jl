@@ -16,7 +16,7 @@ The weight matrix and/or the bias vector (of length `out`) may be provided expli
 - `bias = false` will switch off trainable bias for the layer
 - `init = glorot_uniform` specifies the function for initialization of
 the weight matrix `W = init(out, in)`.
-- `input_quantizer = Sign()` is a quantization function that is applied to the input
+- `input_quantizer = identity` is a quantization function that is applied to the input
 - `weight_quantizer = Sign()` is a quantization function that is applied to the weight matrix
 - `weight_lims = nothing`
 - `bias_lims = nothing`
@@ -35,10 +35,10 @@ function QuantDense(
     weight::AbstractArray,
     bias,
     σ = identity;
-    input_quantizer = Sign(),
+    input_quantizer = identity,
     weight_quantizer = Sign(),
-    weight_lims::Union{Nothing, NTuple{<:Real}} = nothing,
-    bias_lims::Union{Nothing, NTuple{<:Real}} = nothing,
+    weight_lims = nothing,
+    bias_lims = nothing,
  )
     bias = _create_bias(weight, bias, size(weight,1))
 
