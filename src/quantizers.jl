@@ -1,18 +1,37 @@
-abstract type Quantizer{T<:Real} end
+abstract type Quantizer end
 
 Base.broadcastable(q::Quantizer) = Ref(q)
+(q::Quantizer)(x) = value.(q, x)
+
+function ChainRulesCore.rrule(q::Quantizer, x)
+
+    function quantizer_pullback(Δy)
+        return NoTangent(), Δy .* deriv.(q, x)
+    end
+    return value.(q, x), quantizer_pullback
+end
 
 """
-    apply(q::Quantizer, x)
+    value(q::Quantizer, x::Real)
 
-Apply given quantizer `q` to `x`. See concrete quantizers for more details: [`Sign`](@ref)
+Applies quantizer `q` to value `x`.
 """
-function apply end
+function value end
+
+"""
+    deriv(q::Quantizer, x::Real)
+
+Returns gradient of `q` with respect to `x` 
+"""
+function deriv end
 
 """
     Sign(lo, hi, threshold)
 
-deterministic binary quantizer that return `lo` when the given input is less than zero and `hi` otherwise. To apply the quantizer use the `apply` function.
+deterministic binary quantizer that return `lo` when the given input is less than zero and `hi` otherwise.
+
+# TODO:
+- better description of input arguments and rrule implementation
 
 # References
 
@@ -23,14 +42,14 @@ deterministic binary quantizer that return `lo` when the given input is less tha
 julia> q = Sign()
 Sign{Int64}(-1, 1, 1)
 
-julia> apply.(q, [-2, 0.5, 2])
+julia> value.(q, [-2, 0.5, 2])
 3-element Vector{Float64}:
  -1.0
   1.0
   1.0
 ```
 """
-struct Sign{T} <: Quantizer{T}
+struct Sign{T} <: Quantizer
     lo::T
     hi::T
     threshold::T
@@ -46,11 +65,8 @@ end
 
 Sign(; lo::Real=-1, hi::Real=1, threshold::Real=1) = Sign(lo, hi, threshold)
 
-apply(q::Sign, x::T) where {T<:Real} = ifelse(x < 0, T(q.lo), T(q.hi))
+value(q::Sign, x::T) where {T<:Real} = ifelse(x < 0, T(q.lo), T(q.hi))
+deriv(q::Sign, x::T) where {T<:Real} = T(abs(x) <= q.threshold)
 
-function ChainRulesCore.rrule(::typeof(apply), ::typeof(Sign), x)
-    function apply_sign_pullback(Δy)
-        return NoTangent(), NoTangent(), Δy .* (abs.(x) .<= q.threshold)
-    end
-    return apply.(q, x), apply_sign_pullback
-end
+
+
