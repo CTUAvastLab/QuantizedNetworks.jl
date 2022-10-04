@@ -1,3 +1,6 @@
+using Pkg
+Pkg.activate(@__DIR__)
+
 using Revise
 using BinNN
 using Plots
@@ -9,31 +12,29 @@ dataset = MNIST
 train, test = createloader(dataset; batchsize = 256)
 
 # model
-nclasses = 10
-imgsize = (28, 28, 1)
+input_size = size(first(train)[1], 1)
+nclasses = size(first(train)[2], 1)
 
 model = Chain(
-    Dense(prod(imgsize), 32, relu),
+    Dense(input_size, 32, relu),
     Dense(32, nclasses),
 )
 
 weight_lims = (-1, 1)
 bias_lims = nothing
-input_quantizer = identity
 weight_quantizer = Sign()
 
 model_bin = Chain(
-    QuantDense(model[1]; input_quantizer, weight_quantizer, weight_lims, bias_lims),
-    BatchNorm(32),
+    QuantDense(model[1]; σ = identity, weight_quantizer, weight_lims, bias_lims),
+    BatchNorm(32, relu),
     QuantDense(model[2]; input_quantizer, weight_quantizer, weight_lims, bias_lims),
 )
 
 # training
-η = 3f-4
 epochs = 30
 
-history = train_model(model, ADAM(η), train, test; epochs)
-history_bin = train_model(model_bin, ADAM(η), train, test; epochs)
+history = train_model(model, AdaBelief(), train, test; epochs)
+history_bin = train_model(model_bin, AdaBelief(), train, test; epochs)
 
 # plots
 plt1 = plot(history.train_acc; label = "normal model", title = "Train $(dataset)")
