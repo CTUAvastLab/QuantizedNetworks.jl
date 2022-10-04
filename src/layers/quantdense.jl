@@ -62,7 +62,16 @@ function QuantDense(
     return QuantDense(init(out, in), bias, σ; kwargs...)
 end
 
-QuantDense(l::Dense; kwargs...) = QuantDense(copy(l.weight), copy(l.bias), l.σ; kwargs...)
+function QuantDense(
+    l::Dense;
+    weight = copy(l.weight),
+    bias = copy(l.bias),
+    σ = l.σ,
+    kwargs...
+)
+
+    return QuantDense(weight, bias, σ; kwargs...)
+end
 
 @functor QuantDense
 
