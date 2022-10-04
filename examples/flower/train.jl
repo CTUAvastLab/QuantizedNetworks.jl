@@ -58,3 +58,14 @@ plt = plot(
 )
 
 savefig(plt, "$(dataset).png")
+
+# plot
+plt_flower = plot(
+    plot_decision(model, test.data; title = "Normal model (test)"),
+    plot_decision(model_bin, test.data; title = "Binary model (test)");
+    layout = (2, 1),
+    size = (600, 800),
+    legend = false,
+)
+
+savefig(plt_flower, "$(dataset)_decision.png")
