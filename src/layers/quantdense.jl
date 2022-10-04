@@ -62,6 +62,8 @@ function QuantDense(
     return QuantDense(init(out, in), bias, σ; kwargs...)
 end
 
+QuantDense(l::Dense; kwargs...) = QuantDense(copy(l.weight), copy(l.bias), l.σ; kwargs...)
+
 @functor QuantDense
 
 function (l::QuantDense)(x::AbstractVecOrMat)
