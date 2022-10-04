@@ -34,7 +34,7 @@ model_bin = Chain(
 )
 
 # training
-epochs = 50
+epochs = 100
 
 history = train_model(model, AdaBelief(), train, test; epochs)
 history_bin = train_model(model_bin, AdaBelief(), train, test; epochs)
