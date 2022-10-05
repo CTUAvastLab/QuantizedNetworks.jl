@@ -12,7 +12,7 @@ using Flux.Optimise: AbstractOptimiser
 
 export ClippedArray
 export value, deriv
-export Quantizer, Sign, PolySign, SwishSign
+export Quantizer, Sign, PolySign, SwishSign, Ternary
 export QuantDense
 export Bop
 

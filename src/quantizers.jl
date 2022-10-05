@@ -65,7 +65,7 @@ value(::PolySign, x::Real) = ifelse(x < 0, -one(x), one(x))
 deriv(q::PolySign, x::T) where {T<:Real} = T((2 - 2abs(x)) * (abs(x) <= q.threshold))
 
 """
-    SwishSign(lo, hi, threshold)
+    SwishSign(β)
 
 TODO
 """
@@ -83,3 +83,32 @@ function deriv(q::SwishSign, x::T) where {T<:Real}
     β = q.β
     return T((β*(2 - β*x*tanh((β*x)/2)))/(1 + cosh(β * x)))
 end
+
+"""
+    Ternary(Δ, threshold)
+
+TODO
+"""
+struct Ternary{T} <: Quantizer
+    Δ::T
+    threshold::T
+
+    function Ternary(Δ::Real = 0.005, threshold::Real = 1)
+        Δ > 0 || throw(ArgumentError("`Δ` must be positive"))
+        threshold > 0 || throw(ArgumentError("`threshold` must be positive"))
+
+        Δ, threshold = promote(Δ, threshold)
+        return new{typeof(Δ)}(Δ, threshold)
+    end
+end
+
+function value(q::Ternary, x::Real)
+    return if x < q.Δ
+        -one(x)
+    elseif x > q.Δ
+        one(x)
+    else
+        zero(x)
+    end
+end
+deriv(q::Ternary, x::T) where {T<:Real} = T(abs(x) <= q.threshold)
