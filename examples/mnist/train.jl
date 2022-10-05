@@ -23,6 +23,7 @@ model = Chain(
 weight_lims = (-1, 1)
 bias_lims = nothing
 weight_quantizer = Sign()
+input_quantizer = identity
 
 model_bin = Chain(
     QuantDense(model[1]; σ = identity, weight_quantizer, weight_lims, bias_lims),
