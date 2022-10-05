@@ -9,6 +9,8 @@ struct STE{T<:Real} <: AbstractEstimator
     end
 end
 
+Base.show(io::IO, e::STE) = print(io, "STE($(e.threshold))")
+
 struct PolynomialSTE{T} <: AbstractEstimator
     threshold::T
 
@@ -18,6 +20,8 @@ struct PolynomialSTE{T} <: AbstractEstimator
     end
 end
 
+Base.show(io::IO, e::PolynomialSTE) = print(io, "PolynomialSTE($(e.threshold))")
+
 struct SwishSTE{T} <: AbstractEstimator
     β::T
 
@@ -26,3 +30,5 @@ struct SwishSTE{T} <: AbstractEstimator
         return new{T}(β)
     end
 end
+
+Base.show(io::IO, e::SwishSTE) = print(io, "SwishSTE($(e.β))")

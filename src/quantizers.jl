@@ -42,6 +42,7 @@ struct Sign{E<:AbstractEstimator} <: AbstractQuantizer{E}
     end
 end
 
+Base.show(io::IO, q::Sign) = print(io, "Sign($(q.estimator))")
 forward_pass(::Sign, x::Real) = ifelse(x < 0, -one(x), one(x))
 
 function pullback(q::Sign{<:STE}, x::T)::T where {T<:Real}
@@ -72,6 +73,7 @@ struct Heaviside{E<:AbstractEstimator} <: AbstractQuantizer{E}
     end
 end
 
+Base.show(io::IO, q::Heaviside) = print(io, "Heaviside($(q.estimator))")
 forward_pass(::Heaviside, x::Real) = ifelse(x < 0, zero(x), one(x))
 
 function pullback(q::Heaviside{<:STE}, x::T)::T where {T<:Real}
@@ -93,6 +95,8 @@ struct Ternary{E<:AbstractEstimator, T} <: AbstractQuantizer{E}
         return new{E, T}(Δ, estimator)
     end
 end
+
+Base.show(io::IO, q::Ternary) = print(io, "Ternary$((q.Δ, q.estimator))")
 
 function forward_pass(q::Ternary, x::Real)
     return if x < q.Δ
