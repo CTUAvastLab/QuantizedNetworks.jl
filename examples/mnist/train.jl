@@ -21,14 +21,11 @@ model = Chain(
 )
 
 weight_lims = (-1, 1)
-bias_lims = nothing
-weight_quantizer = Sign()
-input_quantizer = identity
+output_quantizer = identity
 
 model_bin = Chain(
-    QuantDense(model[1]; σ = identity, weight_quantizer, weight_lims, bias_lims),
-    BatchNorm(32, relu),
-    QuantDense(model[2]; input_quantizer, weight_quantizer, weight_lims, bias_lims),
+    QuantDense(model[1]; output_quantizer, weight_lims),
+    QuantDense(model[2]; output_quantizer, weight_lims),
 )
 
 # training
