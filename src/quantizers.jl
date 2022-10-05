@@ -1,108 +1,100 @@
-abstract type Quantizer end
+abstract type AbstractQuantizer{E <: AbstractEstimator} end
 
-Base.broadcastable(q::Quantizer) = Ref(q)
-(q::Quantizer)(x) = value.(q, x)
+Base.broadcastable(q::AbstractQuantizer) = Ref(q)
+(q::AbstractQuantizer)(x) = forward_pass.(q, x)
 
-function ChainRulesCore.rrule(q::Quantizer, x)
+function ChainRulesCore.rrule(q::AbstractQuantizer, x)
 
     function quantizer_pullback(Δy)
-        return NoTangent(), Δy .* deriv.(q, x)
+        return NoTangent(), Δy .* pullback.(q, x)
     end
-    return value.(q, x), quantizer_pullback
+    return forward_pass.(q, x), quantizer_pullback
 end
 
 """
-    value(q::Quantizer, x::Real)
+    forward_pass(q::Quantizer, x::Real)
 
 Applies quantizer `q` to value `x`.
 """
-function value end
+function forward_pass end
 
 """
-    deriv(q::Quantizer, x::Real)
+    pullback(q::Quantizer, x::Real)
 
 Returns gradient of `q` with respect to `x`
 """
-function deriv end
+function pullback end
 
 """
-    Sign(threshold::Real = 1)
+    Sign(estimator)
 
-deterministic binary quantizer that return -1 when the given input is less than zero and 1 otherwise. The gradient is estimated using the Straight-Through Estimator (essentially the
-binarization is replaced by a clipped identity on the backward pass).
+deterministic binary quantizer that return -1 when the given input is less than zero and 1 otherwise.
 
 # References
 
 - [`Binarized Neural Networks: Training Deep Neural Networks with Weights and Activations Constrained to +1 or -1`](https://arxiv.org/abs/1602.02830)
 """
-struct Sign{T} <: Quantizer
-    threshold::T
+struct Sign{E<:AbstractEstimator} <: AbstractQuantizer{E}
+    estimator::E
 
-    function Sign(threshold::T = 1) where {T<:Real}
-        threshold > 0 || throw(ArgumentError("`threshold` must be positive"))
-        return new{T}(threshold)
+    function Sign(estimator::E = STE(1)) where {E}
+        return new{E}(estimator)
     end
 end
 
-value(::Sign, x::Real) = ifelse(x < 0, -one(x), one(x))
-deriv(q::Sign, x::T) where {T<:Real} = T(abs(x) <= q.threshold)
+forward_pass(::Sign, x::Real) = ifelse(x < 0, -one(x), one(x))
+
+function pullback(q::Sign{<:STE}, x::T)::T where {T<:Real}
+    t = q.estimator.threshold
+    return abs(x) <= t
+end
+
+function pullback(q::Sign{<:PolynomialSTE}, x::T)::T where {T<:Real}
+    t = q.estimator.threshold
+    return (2 - 2abs(x)) * (abs(x) <= t)
+end
+
+function pullback(q::Sign{<:SwishSTE}, x::T)::T where {T<:Real}
+    β = q.estimator.β
+    return (β*(2 - β*x*tanh((β*x)/2)))/(1 + cosh(β * x))
+end
 
 """
-    PolySign(threshold::Real = 1)
+    Heaviside(estimtor)
 
 TODO
 """
-struct PolySign{T} <: Quantizer
-    threshold::T
+struct Heaviside{E<:AbstractEstimator} <: AbstractQuantizer{E}
+    estimator::E
 
-    function PolySign(threshold::T = 1) where {T<:Real}
-        threshold > 0 || throw(ArgumentError("`threshold` must be positive"))
-        return new{T}(threshold)
+    function Heaviside(estimator::E = STE(1)) where {E}
+        return new{E}(estimator)
     end
 end
 
-value(::PolySign, x::Real) = ifelse(x < 0, -one(x), one(x))
-deriv(q::PolySign, x::T) where {T<:Real} = T((2 - 2abs(x)) * (abs(x) <= q.threshold))
+forward_pass(::Heaviside, x::Real) = ifelse(x < 0, zero(x), one(x))
 
-"""
-    SwishSign(β)
-
-TODO
-"""
-struct SwishSign{T} <: Quantizer
-    β::T
-
-    function SwishSign(β::T = 5) where {T<:Real}
-        β > 0 || throw(ArgumentError("`β` must be positive"))
-        return new{T}(β)
-    end
-end
-
-value(::SwishSign, x::Real) = ifelse(x < 0, -one(x), one(x))
-function deriv(q::SwishSign, x::T) where {T<:Real}
-    β = q.β
-    return T((β*(2 - β*x*tanh((β*x)/2)))/(1 + cosh(β * x)))
+function pullback(q::Heaviside{<:STE}, x::T)::T where {T<:Real}
+    t = q.estimator.threshold
+    return abs(x) <= t
 end
 
 """
-    Ternary(Δ, threshold)
+    Ternary(Δ, estimator)
 
 TODO
 """
-struct Ternary{T} <: Quantizer
+struct Ternary{E<:AbstractEstimator, T} <: AbstractQuantizer{E}
     Δ::T
-    threshold::T
+    estimator::E
 
-    function Ternary(Δ::Real = 0.005, threshold::Real = 1)
+    function Ternary(Δ::T = 0.005, estimator::E = STE(1)) where {T, E}
         Δ > 0 || throw(ArgumentError("`Δ` must be positive"))
-        threshold > 0 || throw(ArgumentError("`threshold` must be positive"))
-
-        Δ, threshold = promote(Δ, threshold)
-        return new{typeof(Δ)}(Δ, threshold)
+        return new{E, T}(Δ, estimator)
     end
 end
 
-function value(q::Ternary, x::Real)
+function forward_pass(q::Ternary, x::Real)
     return if x < q.Δ
         -one(x)
     elseif x > q.Δ
@@ -111,4 +103,8 @@ function value(q::Ternary, x::Real)
         zero(x)
     end
 end
-deriv(q::Ternary, x::T) where {T<:Real} = T(abs(x) <= q.threshold)
+
+function pullback(q::Ternary{<:STE}, x::T)::T where {T<:Real}
+    t = q.estimator.threshold
+    return abs(x) <= t
+end

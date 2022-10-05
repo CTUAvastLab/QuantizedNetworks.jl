@@ -12,11 +12,13 @@ using Flux.Optimise: AbstractOptimiser
 
 export ClippedArray
 export value, deriv
-export Quantizer, Sign, PolySign, SwishSign, Ternary
+export AbstractEstimator, STE, PolynomialSTE, SwishSTE
+export AbstractQuantizer, Sign, Heaviside, Ternary
 export QuantDense
 export Bop
 
 include("clippedarray.jl")
+include("estimators.jl")
 include("quantizers.jl")
 include("layers/quantdense.jl")
 include("optimisers/bop.jl")
