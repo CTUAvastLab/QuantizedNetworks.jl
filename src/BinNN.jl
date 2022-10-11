@@ -13,12 +13,12 @@ export ClippedArray
 export value, deriv
 export AbstractEstimator, STE, PolynomialSTE, SwishSTE
 export AbstractQuantizer, Sign, Heaviside, Ternary
-export QuantDense
+export QuantDense, FQuantizer
 
 include("clippedarray.jl")
 include("estimators.jl")
 include("quantizers.jl")
 include("layers/quantdense.jl")
-
+include("layers/fquantizer.jl")
 
 end # module BinNN
