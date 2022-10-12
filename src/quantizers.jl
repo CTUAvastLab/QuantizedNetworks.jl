@@ -50,9 +50,8 @@ function pullback(q::Sign{<:STE}, x::T)::T where {T<:Real}
     return abs(x) <= t
 end
 
-function pullback(q::Sign{<:PolynomialSTE}, x::T)::T where {T<:Real}
-    t = q.estimator.threshold
-    return (2 - 2abs(x)) * (abs(x) <= t)
+function pullback(::Sign{<:PolynomialSTE}, x::T)::T where {T<:Real}
+    return abs(2 - 2abs(x)) * (abs(x) <= 1)
 end
 
 function pullback(q::Sign{<:SwishSTE}, x::T)::T where {T<:Real}

@@ -11,16 +11,9 @@ end
 
 Base.show(io::IO, e::STE) = print(io, "STE($(e.threshold))")
 
-struct PolynomialSTE{T} <: AbstractEstimator
-    threshold::T
+struct PolynomialSTE <: AbstractEstimator end
 
-    function PolynomialSTE(threshold::T = 1) where {T<:Real}
-        threshold > 0 || throw(ArgumentError("`threshold` must be positive"))
-        return new{T}(threshold)
-    end
-end
-
-Base.show(io::IO, e::PolynomialSTE) = print(io, "PolynomialSTE($(e.threshold))")
+Base.show(io::IO, ::PolynomialSTE) = print(io, "PolynomialSTE")
 
 struct SwishSTE{T} <: AbstractEstimator
     β::T
