@@ -47,12 +47,10 @@ function forward_pass(w, b, x; output_missing::Bool)
         y = similar(w, length(w), size(x, 2))
     end
 
-    for col in 1:size(x,2)
-        for j in 1:size(w,2)
-            for i in 1:size(x,1)
-                idx = (i-1)*size(w,2) + j
-                y[idx, col] = ismissing(x[i, col]) ? 0 : σ(x[i,col] * w[i, j] + b[i, j])
-            end
+    for col in 1:size(x, 2)
+        for j in 1:size(w,2), i in 1:size(x,1)
+            idx = (i-1)*size(w,2) + j
+            y[idx,col] = !ismissing(x[i,col]) * ((x[i,col] * w[i, j] + b[i, j]) > 0)
         end
     end
     return y
@@ -64,16 +62,14 @@ function ChainRulesCore.rrule(::typeof(forward_pass), w, b, x; output_missing::B
     function fquantizer_forward_pass_pullback(Δy)
         Δw, Δb, Δx = zero.((w, b, x))
 
-        for col in 1:size(x,2)
-            for j in 1:size(w,2)
-                for i in 1:size(x,1)
-                    idx = (i-1)*size(w,2) + j
-                    if ismissing(x[i, col])
-                        tmp = Δy[i, col] * y[idx, col]*(1 - y[idx, col])
-                        Δw[i, j] += x[i,col] * tmp
-                        Δb[i, j] += tmp
-                        Δx[i,col] +=  tmp * w[i, j]
-                    end
+        for col in 1:size(x, 2)
+            for j in 1:size(w,2), i in 1:size(x,1)
+                idx = (i-1)*size(w,2) + j
+                if ismissing(x[i, col])
+                    tmp = Δy[i, col] * y[idx, col]*(1 - y[idx, col])
+                    Δw[i, j] += x[i,col] * tmp
+                    Δb[i, j] += tmp
+                    Δx[i,col] +=  tmp * w[i, j]
                 end
             end
         end
