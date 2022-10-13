@@ -47,6 +47,10 @@ function QuantDense(
     return QuantDense(init(out, in), bias, σ; kwargs...)
 end
 
+function QuantDense(in::Integer, out::Integer, σ = identity; kwargs...)
+    return QuantDense(in => out, σ; kwargs...)
+end
+
 function QuantDense(
     l::Dense;
     weight = copy(l.weight),
