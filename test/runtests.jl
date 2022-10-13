@@ -1,6 +1,7 @@
 using Test
 using BinNN
 
+using BinNN.ChainRulesCore
 using BinNN.Flux.Zygote
 
 @testset "clippedarray" begin include("clippedarray.jl"); end
