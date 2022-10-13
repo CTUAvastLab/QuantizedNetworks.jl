@@ -1,8 +1,8 @@
 using Test
-using BinNN
+using QuantizedNetworks
 
-using BinNN.ChainRulesCore
-using BinNN.Flux.Zygote
+using QuantizedNetworks.ChainRulesCore
+using QuantizedNetworks.Flux.Zygote
 
 @testset "clippedarray" begin include("clippedarray.jl"); end
 @testset "estimators" begin include("estimators.jl"); end

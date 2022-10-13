@@ -2,7 +2,7 @@ using Pkg
 Pkg.activate(@__DIR__)
 
 using Revise
-using BinNN
+using QuantizedNetworks
 using Plots
 
 include(joinpath(@__DIR__, "utilities.jl"))

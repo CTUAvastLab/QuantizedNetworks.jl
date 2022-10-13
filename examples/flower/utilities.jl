@@ -1,11 +1,11 @@
-using BinNN
-using BinNN.Flux
+using QuantizedNetworks
+using QuantizedNetworks.Flux
 using ProgressMeter
 
-using BinNN.Flux.Data: DataLoader
-using BinNN.Flux: onehotbatch, onecold
-using BinNN.Flux.Losses: logitcrossentropy
-using BinNN.Flux.Optimise: update!
+using QuantizedNetworks.Flux.Data: DataLoader
+using QuantizedNetworks.Flux: onehotbatch, onecold
+using QuantizedNetworks.Flux.Losses: logitcrossentropy
+using QuantizedNetworks.Flux.Optimise: update!
 
 # data creation
 # The flower problem is a toy dataset with symmetrically spaced

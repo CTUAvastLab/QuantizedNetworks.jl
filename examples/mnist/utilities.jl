@@ -1,12 +1,12 @@
-using BinNN
-using BinNN.Flux
+using QuantizedNetworks
+using QuantizedNetworks.Flux
 using MLDatasets
 using ProgressMeter
 
-using BinNN.Flux.Data: DataLoader
-using BinNN.Flux: onehotbatch, onecold
-using BinNN.Flux.Losses: logitcrossentropy
-using BinNN.Flux.Optimise: update!
+using QuantizedNetworks.Flux.Data: DataLoader
+using QuantizedNetworks.Flux: onehotbatch, onecold
+using QuantizedNetworks.Flux.Losses: logitcrossentropy
+using QuantizedNetworks.Flux.Optimise: update!
 
 ENV["DATADEPS_ALWAYS_ACCEPT"] = "true"
 

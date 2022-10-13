@@ -1,4 +1,4 @@
-module BinNN
+module QuantizedNetworks
 
 using Distributions
 using ChainRulesCore
@@ -21,4 +21,4 @@ include("quantizers.jl")
 include("layers/quantdense.jl")
 include("layers/fquantizer.jl")
 
-end # module BinNN
+end # module QuantizedNetworks

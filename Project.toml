@@ -1,4 +1,4 @@
-name = "BinNN"
+name = "QuantizedNetworks"
 uuid = "a9bb74d8-689f-4871-b223-187fd687e8a4"
 authors = ["Vaclav <vaclav.macha92@gmail.com>"]
 version = "0.1.0"

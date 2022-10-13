@@ -1,4 +1,4 @@
-using BinNN: forward_pass, pullback
+using QuantizedNetworks: forward_pass, pullback
 
 # Sign function
 @testset "Sing quantizer" begin
