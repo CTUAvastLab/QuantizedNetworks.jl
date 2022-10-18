@@ -21,22 +21,27 @@ model = Chain(
     Dense(20, nclasses),
 )
 
-k = 5
-weight_lims = (-1, 1)
-output_quantizer = Sign(SwishSTE())
+k = 100
+σ = hardtanh
+kwargs = (;
+    weight_lims = (-1, 1),
+    bias_lims = (-1, 1),
+    output_quantizer = Sign(),
+    batchnorm = true,
+)
 
 model_bin = Chain(
     FQuantizer((input_size, k)),
-    QuantDense(k*input_size => 20, tanh; output_quantizer, weight_lims),
-    QuantDense(20 => 20, tanh; output_quantizer, weight_lims),
-    QuantDense(20 =>nclasses; output_quantizer, weight_lims),
+    QuantDense(k*input_size => 20, σ; kwargs...),
+    QuantDense(20 => 20, σ; kwargs...),
+    QuantDense(20 =>nclasses; kwargs...),
 )
 
 # training
 epochs = 500
 
-history = train_model(model, AdaBelief(), train, test; epochs)
-history_bin = train_model(model_bin, AdaBelief(), train, test; epochs)
+history = train_model(model, AdaBelief(0.01), train, test; epochs)
+history_bin = train_model(model_bin, AdaBelief(0.01), train, test; epochs)
 
 # plots
 plt1 = plot(history.train_acc; label = "normal model", title = "Train $(dataset)")
