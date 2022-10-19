@@ -21,20 +21,25 @@ model = Chain(
 )
 
 k = 5
-weight_lims = (-1, 1)
-output_quantizer = Sign()
+σ = hardtanh
+kwargs = (;
+    weight_lims = (-1, 1),
+    bias_lims = (-1, 1),
+    output_quantizer = Sign(),
+    batchnorm = true,
+)
 
 model_bin = Chain(
     FQuantizer((input_size, k)),
-    QuantDense(k*input_size => 32, tanh; output_quantizer, weight_lims),
-    QuantDense(32 => nclasses; output_quantizer, weight_lims),
+    QuantDense(k*input_size => 32, σ; kwargs...),
+    QuantDense(32 => nclasses; kwargs...),
 )
 
 # training
 epochs = 30
 
-history = train_model(model, AdaBelief(), train, test; epochs)
-history_bin = train_model(model_bin, AdaBelief(), train, test; epochs)
+history = train_model(model, AdaBelief(0.01), train, test; epochs)
+history_bin = train_model(model_bin, AdaBelief(0.01), train, test; epochs)
 
 # plots
 plt1 = plot(history.train_acc; label = "normal model", title = "Train $(dataset)")
