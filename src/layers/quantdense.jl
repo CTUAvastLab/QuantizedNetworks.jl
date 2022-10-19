@@ -1,10 +1,11 @@
-struct QuantDense{F, M, B, Q1, Q2, N}
+struct QuantDense{F, M, B, Q1, S, Q2, N}
     weight::M
     bias::B
     σ::F
 
-    weight_quantizer::Q2
-    output_quantizer::Q1
+    weight_quantizer::Q1
+    weight_sparsifier::S
+    output_quantizer::Q2
     batchnorm::N
 end
 
@@ -13,6 +14,7 @@ function QuantDense(
     bias,
     σ = identity;
     weight_quantizer = Ternary(),
+    weight_sparsifier = identity,
     output_quantizer = Sign(),
     batchnorm::Bool = true,
  )
@@ -22,6 +24,7 @@ function QuantDense(
         _create_bias(weight, bias, size(weight,1)),
         batchnorm ? identity : σ,
         weight_quantizer,
+        weight_sparsifier,
         output_quantizer,
         batchnorm ? BatchNorm(size(weight, 1), σ) : identity,
     )
@@ -56,8 +59,9 @@ end
 function (l::QuantDense)(x::AbstractVecOrMat)
     σ = NNlib.fast_act(l.σ, x)  # replaces tanh => tanh_fast, etc
     wq = l.weight_quantizer(l.weight)
+    wqs = l.weight_sparsifier(wq)
 
-    return l.output_quantizer(l.batchnorm(σ.(wq * x .+ l.bias)))
+    return l.output_quantizer(l.batchnorm(σ.(wqs * x .+ l.bias)))
 end
 
 function (l::QuantDense)(x::AbstractArray)
