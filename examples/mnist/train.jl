@@ -16,16 +16,20 @@ input_size = size(first(train)[1], 1)
 nclasses = size(first(train)[2], 1)
 
 model = Chain(
-    Dense(input_size, 32, relu),
-    Dense(32, nclasses),
+    Dense(input_size => 32, relu),
+    Dense(32 => nclasses),
 )
 
-weight_lims = (-1, 1)
-output_quantizer = identity
+σ = hardtanh
+kwargs = (;
+    init = (dims...) -> ClippedArray(dims...; lo = -1, hi = 1),
+    output_quantizer = identity,
+    batchnorm = true,
+)
 
 model_bin = Chain(
-    QuantDense(model[1]; output_quantizer, weight_lims),
-    QuantDense(model[2]; output_quantizer, weight_lims),
+    QuantDense(input_size => 32, σ; kwargs...),
+    QuantDense(32 =>nclasses; kwargs...),
 )
 
 # training

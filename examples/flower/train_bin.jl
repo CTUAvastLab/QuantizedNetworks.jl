@@ -16,16 +16,15 @@ input_size = size(first(train)[1], 1)
 nclasses = size(first(train)[2], 1)
 
 model = Chain(
-    Dense(input_size, 20, relu),
-    Dense(20, 20, relu),
-    Dense(20, nclasses),
+    Dense(input_size => 20, relu),
+    Dense(20 => 20, relu),
+    Dense(20 => nclasses),
 )
 
 k = 100
 σ = hardtanh
 kwargs = (;
-    weight_lims = (-1, 1),
-    bias_lims = (-1, 1),
+    init = (dims...) -> ClippedArray(dims...; lo = -1, hi = 1),
     output_quantizer = Sign(),
     batchnorm = true,
 )

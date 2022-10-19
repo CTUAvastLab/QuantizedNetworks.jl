@@ -16,25 +16,29 @@ input_size = size(first(train)[1], 1)
 nclasses = size(first(train)[2], 1)
 
 model = Chain(
-    Dense(input_size, 20, relu),
-    Dense(20, 20, relu),
-    Dense(20, nclasses),
+    Dense(input_size => 20, relu),
+    Dense(20 => 20, relu),
+    Dense(20 => nclasses),
 )
 
-weight_lims = (-1, 1)
-output_quantizer = identity
+σ = hardtanh
+kwargs = (;
+    init = (dims...) -> ClippedArray(dims...; lo = -1, hi = 1),
+    output_quantizer = identity,
+    batchnorm = true,
+)
 
 model_bin = Chain(
-    QuantDense(model[1]; output_quantizer, weight_lims),
-    QuantDense(model[2]; output_quantizer, weight_lims),
-    QuantDense(model[3]; output_quantizer, weight_lims),
+    QuantDense(input_size => 20, σ; kwargs...),
+    QuantDense(20 => 20, σ; kwargs...),
+    QuantDense(20 =>nclasses; kwargs...),
 )
 
 # training
-epochs = 100
+epochs = 500
 
-history = train_model(model, AdaBelief(), train, test; epochs)
-history_bin = train_model(model_bin, AdaBelief(), train, test; epochs)
+history = train_model(model, AdaBelief(0.01), train, test; epochs)
+history_bin = train_model(model_bin, AdaBelief(0.01), train, test; epochs)
 
 # plots
 plt1 = plot(history.train_acc; label = "normal model", title = "Train $(dataset)")
