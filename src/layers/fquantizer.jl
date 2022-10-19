@@ -77,3 +77,44 @@ function ChainRulesCore.rrule(::typeof(forward_pass), w, b, x; output_missing::B
     end
     return y, fquantizer_forward_pass_pullback
 end
+
+
+# pokus
+struct FQuantizer2{M<:AbstractMatrix, B} <: AbstractFQuantizer
+    weight::M
+    bias::B
+    output_missing::Bool
+
+    function FQuantizer2(
+        weight::AbstractMatrix,
+        bias::AbstractMatrix;
+        weight_lims = nothing,
+        bias_lims = nothing,
+        output_missing::Bool = false,
+    )
+
+        weight = isnothing(weight_lims) ? weight : ClippedArray(weight, weight_lims...)
+        bias = isnothing(bias_lims) ? bias : ClippedArray(bias, bias_lims...)
+        return new{typeof(weight), typeof(bias)}(weight, bias, output_missing)
+    end
+end
+
+Flux.@functor FQuantizer2
+
+function FQuantizer2(
+    dims::NTuple{2, <:Integer};
+    init_weight = glorot_uniform,
+    init_bias = (d...) -> randn(Float32, d...),
+    kwargs...
+)
+    return FQuantizer2(init_weight(dims...), init_bias(dims...); kwargs...)
+end
+
+ispositive(x::T) where {T <:Real} = T(x > 0)
+ispositive(x::Missing) = false
+
+function (q::FQuantizer2)(x)
+    w, b = q.weight, q.bias
+    xr = reshape(x, size(x, 1), 1, :)
+    return Flux.flatten(ispositive.(xr .* w .+ b))
+end

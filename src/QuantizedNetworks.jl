@@ -12,7 +12,7 @@ using NNlib: hardtanh
 export ClippedArray
 export AbstractEstimator, STE, PolynomialSTE, SwishSTE
 export AbstractQuantizer, Sign, Heaviside, Ternary
-export QuantDense, FQuantizer
+export QuantDense, FQuantizer, FQuantizer2
 
 include("clippedarray.jl")
 include("estimators.jl")
