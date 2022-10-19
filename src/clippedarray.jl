@@ -28,6 +28,10 @@ Base.getindex(c::ClippedArray, args...) = getindex(c.x, args...)
 Base.setindex!(c::ClippedArray, v, args...) = setindex!(c.x, clamp.(v, c.lo, c.hi), args...)
 Base.zero(c::ClippedArray) = ClippedArray(zero(c.x), c.lo, c.hi)
 
+Base.similar(c::ClippedArray) = ClippedArray(similar(c.x), c.lo, c.hi)
+function Base.similar(c::ClippedArray, dims::Union{Integer, AbstractUnitRange}...)
+    return ClippedArray(similar(c.x, dims...), c.lo, c.hi)
+end
 
 # ChainRulesCore utils
 function ChainRulesCore.ProjectTo(c::ClippedArray)
