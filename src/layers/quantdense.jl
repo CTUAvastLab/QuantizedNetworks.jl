@@ -1,8 +1,4 @@
-"""
-    QuantDense(in => out, σ=identity; bias=true, init=glorot_uniform)
-    QuantDense(W::AbstractMatrix, [bias, σ]; kwargs...)
-"""
-struct QuantDense{F, M<:AbstractMatrix, B, Q1, Q2, N}
+struct QuantDense{F, M, B, Q1, Q2, N}
     weight::M
     bias::B
     σ::F
@@ -18,18 +14,12 @@ function QuantDense(
     σ = identity;
     weight_quantizer = Ternary(),
     output_quantizer = Sign(),
-    weight_lims = nothing,
-    bias_lims = nothing,
     batchnorm::Bool = true,
  )
-    bias = _create_bias(weight, bias, size(weight,1))
-    if isa(bias, AbstractArray) && !isnothing(bias_lims)
-        bias = ClippedArray(bias, bias_lims...)
-    end
 
     return QuantDense(
-        isnothing(weight_lims) ? weight : ClippedArray(weight, weight_lims...),
-        bias,
+        weight,
+        _create_bias(weight, bias, size(weight,1)),
         batchnorm ? identity : σ,
         weight_quantizer,
         output_quantizer,
@@ -40,7 +30,7 @@ end
 function QuantDense(
     (in, out)::Pair{<:Integer, <:Integer},
     σ = identity;
-    init = glorot_uniform,
+    init = ClippedArray,
     bias = false,
     kwargs...
 )
@@ -58,7 +48,6 @@ function QuantDense(
     σ = l.σ,
     kwargs...
 )
-
     return QuantDense(weight, bias, σ; kwargs...)
 end
 
