@@ -19,6 +19,15 @@ mutable struct ClippedArray{T,N,A<:AbstractArray{T,N}} <: AbstractArray{T,N}
     end
 end
 
+function ClippedArray(
+    dims::Union{Integer, AbstractUnitRange}...;
+    lo::Real=-1,
+    hi::Real=1,
+    init = glorot_uniform,
+)
+    return ClippedArray(init(dims...), lo, hi)
+end
+
 const ClippedVector{T,A} = ClippedArray{T,1,A}
 const ClippedMatrix{T,A} = ClippedArray{T,2,A}
 
