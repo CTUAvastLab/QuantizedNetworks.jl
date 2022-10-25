@@ -21,7 +21,7 @@ model = Chain(
     Dense(20 => nclasses),
 )
 
-k = 100
+k = 25
 σ = hardtanh
 kwargs = (;
     init = (dims...) -> ClippedArray(dims...; lo = -1, hi = 1),
@@ -37,7 +37,7 @@ model_bin = Chain(
 )
 
 # training
-epochs = 500
+epochs = 100
 
 history = train_model(model, AdaBelief(0.01), train, test; epochs)
 history_bin = train_model(model_bin, AdaBelief(0.01), train, test; epochs)

@@ -20,7 +20,6 @@ model = Chain(
     Dense(32 => nclasses),
 )
 
-k = 10
 σ = hardtanh
 kwargs = (;
     init = (dims...) -> ClippedArray(dims...; lo = -1, hi = 1),
@@ -29,16 +28,16 @@ kwargs = (;
 )
 
 model_bin = Chain(
-    FQuantizer((input_size, k)),
-    QuantDense(k*input_size => 32, σ; kwargs...),
+    x -> Float32.(ifelse.(x .> 0, 1, -1)),
+    QuantDense(input_size => 32, σ; kwargs...),
     QuantDense(32 => nclasses; kwargs...),
 )
 
 # training
 epochs = 30
 
-history = train_model(model, AdaBelief(0.01), train, test; epochs)
-history_bin = train_model(model_bin, AdaBelief(0.01), train, test; epochs)
+history = train_model(model, AdaBelief(), train, test; epochs)
+history_bin = train_model(model_bin, AdaBelief(), train, test; epochs)
 
 # plots
 plt1 = plot(history.train_acc; label = "normal model", title = "Train $(dataset)")
