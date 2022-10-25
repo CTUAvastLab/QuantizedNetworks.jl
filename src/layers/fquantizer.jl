@@ -50,7 +50,7 @@ function forward_pass(w, b, x; output_missing::Bool)
     for col in 1:size(x, 2)
         for j in 1:size(w,2), i in 1:size(x,1)
             idx = (i-1)*size(w,2) + j
-            y[idx,col] = !ismissing(x[i,col]) * ((x[i,col] * w[i, j] + b[i, j]) > 0)
+            y[idx,col] = !ismissing(x[i,col]) * ifelse((x[i,col] * w[i, j] + b[i, j]) > 0, 1, -1)
         end
     end
     return y
