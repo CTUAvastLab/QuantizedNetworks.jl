@@ -10,17 +10,8 @@ function Flux.Optimise.apply!(b::Bop, x, Δ)
     ρ, τ = b.rho, b.threshold
     mt = get!(() -> zero(x), b.momentum, x)::typeof(x)
 
-    @. mt = (1 - ρ) * mt + ρ * Δ
-    @. Δ = ifelse(abs(mt) > τ && sign(mt) == sign(Δ), -one(x), one(x))
-    return Δ
-end
-
-function Flux.Optimise.apply!(b::Bop, x, Δ)
-    ρ, τ = b.rho, b.threshold
-    mt = get!(() -> zero(x), b.momentum, x)::typeof(x)
-
-    @. mt = ρ * (Δ - mt)
-    @. Δ = ifelse((-sign(x * mt - τ) * x) < 0, -one(x), one(x))
+    @. mt = (1 - ρ) * mt + Δ * ρ
+    @. Δ = ifelse((abs(mt) > τ) && (sign(mt) == sign(Δ)), one(x), -one(x))
     return Δ
 end
 
