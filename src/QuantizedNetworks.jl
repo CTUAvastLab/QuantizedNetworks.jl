@@ -15,7 +15,7 @@ using NNlib: hardtanh
 export ClippedArray, L0Gate
 export AbstractEstimator, STE, PolynomialSTE, SwishSTE
 export AbstractQuantizer, Sign, Heaviside, Ternary
-export QuantDense, FQuantizer, FQuantizer2
+export QuantDense, FQuantizer
 export Bop, CaseOptimizer, isbinary
 
 include("clippedarray.jl")
