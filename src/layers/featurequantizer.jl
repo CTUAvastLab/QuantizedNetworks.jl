@@ -30,13 +30,16 @@ function Base.show(io::IO, q::FeatureQuantizer)
 end
 
 function (q::FeatureQuantizer)(x)
-    w, b = q.weight, q.bias
+    y = _forward_pass(q.weight, q.bias, x)
+    return q.output_quantizer(y)
+end
+
+function _forward_pass(w, b, x)
     w1, b1, x1 = size(w, 1), size(b, 1), size(x, 1)
     if !(w1 == b1 == x1)
         msg = "first dimension of weight ($w1), bias ($b1) and x ($x1) must match"
         throw(DimensionMismatch(msg))
     end
-
     y = similar(x, length(w), size(x, 2))
     for col in axes(x, 2)
         for j in axes(w,2), i in axes(x,1)
@@ -44,13 +47,12 @@ function (q::FeatureQuantizer)(x)
             y[idx,col] = x[i,col] * w[i, j] + b[i, j]
         end
     end
-    return q.output_quantizer(y)
+    return y
 end
 
-function ChainRulesCore.rrule(q::FeatureQuantizer, x)
+function ChainRulesCore.rrule(::typeof(_forward_pass), w, b, x)
 
     function FeatureQuantizer_pullback(Δy)
-        w, b = q.weight, q.bias
         Δw, Δb, Δx = zero.((w, b, x))
 
         for col in axes(x, 2)
@@ -62,12 +64,7 @@ function ChainRulesCore.rrule(q::FeatureQuantizer, x)
                 end
             end
         end
-        if isa(q.output_quantizer, AbstractQuantizer)
-            Δw .*= pullback(q.output_quantizer, w)
-            Δb .*= pullback(q.output_quantizer, b)
-            Δx .*= pullback(q.output_quantizer, x)
-        end
-        return (; w = Δw, b = Δb), Δx
+        return NoTangent(), Δw, Δb, Δx
     end
-    return q(x), FeatureQuantizer_pullback
+    return _forward_pass(w, b, x), FeatureQuantizer_pullback
 end
