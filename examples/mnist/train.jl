@@ -4,10 +4,12 @@ Pkg.activate(@__DIR__)
 using Revise
 using QuantizedNetworks
 using Plots
+using Random
 
 include(joinpath(@__DIR__, "utilities.jl"))
 
 # data
+Random.seed!(1234)
 dataset = MNIST
 train, test = createloader(dataset; batchsize = 256)
 

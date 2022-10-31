@@ -4,10 +4,12 @@ Pkg.activate(@__DIR__)
 using Revise
 using QuantizedNetworks
 using Plots
+using Random
 
 include(joinpath(@__DIR__, "utilities.jl"))
 
 # data
+Random.seed!(1234)
 dataset = "Flower"
 train, test = createloader(900, 900; batchsize = 100)
 
