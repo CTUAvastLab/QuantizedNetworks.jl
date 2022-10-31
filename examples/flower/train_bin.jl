@@ -25,14 +25,15 @@ model = Chain(
 
 k = 25
 σ = hardtanh
+output_quantizer = Sign(STE(1))
 kwargs = (;
     init = (dims...) -> ClippedArray(dims...; lo = -1, hi = 1),
-    output_quantizer = Sign(),
+    output_quantizer = output_quantizer,
     batchnorm = true,
 )
 
 model_bin = Chain(
-    FQuantizer((input_size, k)),
+    FeatureQuantizer(input_size, k; output_quantizer),
     QuantDense(k*input_size => 20, σ; kwargs...),
     QuantDense(20 => 20, σ; kwargs...),
     QuantDense(20 =>nclasses; kwargs...),
