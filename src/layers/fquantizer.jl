@@ -75,6 +75,10 @@ function ChainRulesCore.rrule(::typeof(forward_pass), w, b, x; output_missing::B
     function fquantizer_forward_pass_pullback(Δy)
         Δw, Δb, Δx = zero.((w, b, x))
 
+        project_w = ProjectTo(w)
+        project_b = ProjectTo(b)
+        project_x = ProjectTo(x)
+
         for col in 1:size(x, 2)
             for j in 1:size(w,2), i in 1:size(x,1)
                 idx = (i-1)*size(w,2) + j
@@ -82,11 +86,11 @@ function ChainRulesCore.rrule(::typeof(forward_pass), w, b, x; output_missing::B
                     tmp = Δy[i, col] * y[idx, col]*(1 - y[idx, col])
                     Δw[i, j] += x[i,col] * tmp
                     Δb[i, j] += tmp
-                    Δx[i,col] +=  tmp * w[i, j]
+                    Δx[i,col] +=  w[i, j] * tmp
                 end
             end
         end
-        return NoTangent(), Δw, Δb, Δx
+        return NoTangent(), project_w(Δw), project_b(Δb), project_x(Δx)
     end
     return y, fquantizer_forward_pass_pullback
 end
