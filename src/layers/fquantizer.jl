@@ -42,7 +42,17 @@ end
 ispositive(x::T) where {T <:Real} = ifelse(x > 0, one(T), -one(T))
 ispositive(x::Missing) = -1
 
-function forward_pass(w, b, x; output_missing::Bool)
+function forward_pass(w, b, x; output_missing::Bool = false)
+    w1, b1, x1 = size(w, 1), size(b, 1), size(x, 1)
+    if w1 != x1
+        msg = "first dimension of w ($w1) must match first dimension of x ($x1)"
+        throw(DimensionMismatch(msg))
+    end
+    if b1 != x1
+        msg = "first dimension of b ($b1) must match first dimension of x ($x1)"
+        throw(DimensionMismatch(msg))
+    end
+
     if output_missing
         y = similar(w, length(w) + size(x, 1), size(x, 2))
         y[end-size(x,1)+1:end, :] .= ifelse.(ismissing.(x), -1, 1)
@@ -59,7 +69,7 @@ function forward_pass(w, b, x; output_missing::Bool)
     return y
 end
 
-function ChainRulesCore.rrule(::typeof(forward_pass), w, b, x; output_missing::Bool)
+function ChainRulesCore.rrule(::typeof(forward_pass), w, b, x; output_missing::Bool = false)
     y = forward_pass(w, b, x; output_missing)
 
     function fquantizer_forward_pass_pullback(Δy)
