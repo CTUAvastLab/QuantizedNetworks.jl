@@ -1,8 +1,12 @@
 using Test
+
 using QuantizedNetworks
-using ChainRulesCore
 using ChainRulesTestUtils
-using Zygote
+using FiniteDifferences
+
+using QuantizedNetworks.ChainRulesCore
+using QuantizedNetworks.Flux
+using QuantizedNetworks.Zygote
 
 
 @testset "clippedarray" begin include("clippedarray.jl"); end

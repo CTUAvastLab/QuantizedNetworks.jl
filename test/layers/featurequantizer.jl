@@ -48,8 +48,28 @@ ks = 1:2:10
                         @test q(x) == output_quantizer(y)
                     end
 
-                    @testset "pullback" begin
+                    if !contains_missing
+                        @testset "pullback" begin
+                            _fw(w) = sum(_forward_pass(w, b, x))
+                            _fb(b) = sum(_forward_pass(w, b, x))
+                            _fx(x) = sum(_forward_pass(w, b, x))
 
+                            ps = Flux.params([q, x])
+                            gs = Flux.gradient(() -> sum(_forward_pass(w, b, x)), ps)
+
+                            gs[ps[1]] ≈ grad(central_fdm(5, 1), _fw, w)[1]
+                            gs[ps[2]] ≈ grad(central_fdm(5, 1), _fb, b)[1]
+                            gs[ps[3]] ≈ grad(central_fdm(5, 1), _fx, x)[1]
+
+                            if output_quantizer == identity
+                                ps = Flux.params([q, x])
+                                gs = Flux.gradient(() -> sum(q(x)), ps)
+
+                                gs[ps[1]] ≈ grad(central_fdm(5, 1), _fw, w)[1]
+                                gs[ps[2]] ≈ grad(central_fdm(5, 1), _fb, b)[1]
+                                gs[ps[3]] ≈ grad(central_fdm(5, 1), _fx, x)[1]
+                            end
+                        end
                     end
                 end
             end

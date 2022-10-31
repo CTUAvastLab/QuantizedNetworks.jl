@@ -12,10 +12,8 @@ Zygote = "e88e6eb3-aa80-5325-afca-941959d7151f"
 
 [extras]
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
-ChainRulesCore = "d360d2e6-b24c-11e9-a2a3-2a2ae2dbcce4"
 ChainRulesTestUtils = "cdddcdb0-9152-4a09-a978-84456f9df70a"
-Zygote = "e88e6eb3-aa80-5325-afca-941959d7151f"
-
+FiniteDifferences = "26cc04aa-876d-5657-8c51-4c34ba976000"
 
 [targets]
-test = ["Test", "ChainRulesCore", "ChainRulesTestUtils", "Zygote"]
+test = ["Test", "ChainRulesTestUtils", "FiniteDifferences"]
