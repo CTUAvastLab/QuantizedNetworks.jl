@@ -3,7 +3,7 @@ abstract type AbstractEstimator end
 struct STE{T<:Real} <: AbstractEstimator
     threshold::T
 
-    function STE(threshold::T = 1) where {T<:Real}
+    function STE(threshold::T = 2) where {T<:Real}
         threshold > 0 || throw(ArgumentError("`threshold` must be positive"))
         return new{T}(threshold)
     end

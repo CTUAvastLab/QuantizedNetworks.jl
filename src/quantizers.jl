@@ -37,7 +37,7 @@ deterministic binary quantizer that return -1 when the given input is less than 
 struct Sign{E<:AbstractEstimator} <: AbstractQuantizer{E}
     estimator::E
 
-    function Sign(estimator::E = STE(1)) where {E}
+    function Sign(estimator::E = STE()) where {E}
         return new{E}(estimator)
     end
 end
@@ -67,7 +67,7 @@ TODO
 struct Heaviside{E<:AbstractEstimator} <: AbstractQuantizer{E}
     estimator::E
 
-    function Heaviside(estimator::E = STE(1)) where {E}
+    function Heaviside(estimator::E = STE()) where {E}
         return new{E}(estimator)
     end
 end
@@ -89,7 +89,7 @@ struct Ternary{E<:AbstractEstimator, T} <: AbstractQuantizer{E}
     Δ::T
     estimator::E
 
-    function Ternary(Δ::T = 0.005, estimator::E = STE(1)) where {T, E}
+    function Ternary(Δ::T = 0.005, estimator::E = STE()) where {T, E}
         Δ > 0 || throw(ArgumentError("`Δ` must be positive"))
         return new{E, T}(Δ, estimator)
     end

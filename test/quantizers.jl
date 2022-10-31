@@ -1,13 +1,13 @@
 using QuantizedNetworks: forward_pass, pullback
 
 # Sign function
-@testset "Sing quantizer" begin
+@testset "Sign quantizer" begin
     Ts = [Float64, Float32]
     inputs = [-5, -2, -1, -0.5,  0, 0.5, 1, 2, 5]
     outputs = [-1, -1, -1, -1, 1, 1, 1, 1, 1]
     quantizers = [
-        (Sign(), [0, 0, 1, 1, 1, 1, 1, 0, 0]),
-        (Sign(STE()), [0, 0, 1, 1, 1, 1, 1, 0, 0]),
+        (Sign(), [0, 1, 1, 1, 1, 1, 1, 1, 0]),
+        (Sign(STE()), [0, 1, 1, 1, 1, 1, 1, 1, 0]),
         (Sign(STE(1)), [0, 0, 1, 1, 1, 1, 1, 0, 0]),
         (Sign(STE(2)), [0, 1, 1, 1, 1, 1, 1, 1, 0]),
         (Sign(PolynomialSTE()), [0, 0, 0, 1, 2, 1, 0, 0, 0]),
