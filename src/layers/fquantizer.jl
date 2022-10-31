@@ -45,7 +45,7 @@ ispositive(x::Missing) = -1
 function forward_pass(w, b, x; output_missing::Bool)
     if output_missing
         y = similar(w, length(w) + size(x, 1), size(x, 2))
-        y[end-size(x,1)+1:end, :] .= ismissing.(x)
+        y[end-size(x,1)+1:end, :] .= ifelse.(ismissing.(x), -1, 1)
     else
         y = similar(w, length(w), size(x, 2))
     end
