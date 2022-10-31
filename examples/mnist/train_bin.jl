@@ -40,11 +40,11 @@ history = train_model(model, AdaBelief(), train, test; epochs)
 history_bin = train_model(model_bin, AdaBelief(), train, test; epochs)
 
 # plots
-plt1 = plot(history.train_acc; label = "normal model", title = "Train $(dataset)")
-plot!(plt1, history_bin.train_acc; label = "binary model")
+plt1 = plot(history.train_acc; label = "normal model", title = "Train $(dataset)");
+plot!(plt1, history_bin.train_acc; label = "binary model");
 
-plt2 = plot(history.test_acc; label = "normal model", title = "Test $(dataset)")
-plot!(plt2, history_bin.test_acc; label = "binary model")
+plt2 = plot(history.test_acc; label = "normal model", title = "Test $(dataset)");
+plot!(plt2, history_bin.test_acc; label = "binary model");
 
 plt = plot(
     plt1,
