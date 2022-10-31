@@ -1,14 +1,27 @@
 abstract type AbstractQuantizer{E <: AbstractEstimator} end
 
 Base.broadcastable(q::AbstractQuantizer) = Ref(q)
-(q::AbstractQuantizer)(x) = forward_pass.(q, x)
+
+(q::AbstractQuantizer)(x) = forward_pass(q, x)
+
+forward_pass(q::AbstractQuantizer, x::AbstractArray) = forward_pass.(q, x)
+function forward_pass(q::AbstractQuantizer, x::AbstractArray{Union{Missing, T}}) where T
+    return T.(forward_pass.(q, x))
+end
+
+pullback(q::AbstractQuantizer, x::AbstractArray) = pullback.(q, x)
+function pullback(q::AbstractQuantizer, x::AbstractArray{Union{Missing, T}}) where T
+    return T.(pullback.(q, x))
+end
 
 function ChainRulesCore.rrule(q::AbstractQuantizer, x)
+    y = q(x)
+    project_y = ProjectTo(y)
 
     function quantizer_pullback(Δy)
-        return NoTangent(), Δy .* pullback.(q, x)
+        return NoTangent(), project_y(Δy .* pullback(q, x))
     end
-    return forward_pass.(q, x), quantizer_pullback
+    return y, quantizer_pullback
 end
 
 """
@@ -43,8 +56,11 @@ struct Sign{E<:AbstractEstimator} <: AbstractQuantizer{E}
 end
 
 Base.show(io::IO, q::Sign) = print(io, "Sign($(q.estimator))")
+
+forward_pass(::Sign, x::Missing) = -1
 forward_pass(::Sign, x::Real) = ifelse(x < 0, -one(x), one(x))
 
+pullback(q::Sign, x::Missing) = 0
 function pullback(q::Sign{<:STE}, x::T)::T where {T<:Real}
     t = q.estimator.threshold
     return abs(x) <= t
@@ -73,8 +89,11 @@ struct Heaviside{E<:AbstractEstimator} <: AbstractQuantizer{E}
 end
 
 Base.show(io::IO, q::Heaviside) = print(io, "Heaviside($(q.estimator))")
+
+forward_pass(::Heaviside, x::Missing) = 0
 forward_pass(::Heaviside, x::Real) = ifelse(x < 0, zero(x), one(x))
 
+pullback(q::Heaviside, x::Missing) = 0
 function pullback(q::Heaviside{<:STE}, x::T)::T where {T<:Real}
     t = q.estimator.threshold
     return abs(x) <= t
@@ -97,6 +116,7 @@ end
 
 Base.show(io::IO, q::Ternary) = print(io, "Ternary$((q.Δ, q.estimator))")
 
+forward_pass(::Ternary, x::Missing) = -1
 function forward_pass(q::Ternary, x::Real)
     return if x < q.Δ
         -one(x)
@@ -107,6 +127,7 @@ function forward_pass(q::Ternary, x::Real)
     end
 end
 
+pullback(q::Ternary, x::Missing) = 0
 function pullback(q::Ternary{<:STE}, x::T)::T where {T<:Real}
     t = q.estimator.threshold
     return abs(x) <= t
