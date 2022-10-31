@@ -7,7 +7,6 @@ end
 Flux.@functor MissingQuantizer
 
 function (q::MissingQuantizer)(x)
-    y = zero(x)
-    y .= ifelse.(ismissing.(x), -1, 1)
-    return q.output_quantizer(y)
+    T = truetype(x)
+    return q.output_quantizer(ifelse.(ismissing.(x), -one(T), one(T)))
 end

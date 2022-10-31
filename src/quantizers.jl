@@ -4,13 +4,13 @@ Base.broadcastable(q::AbstractQuantizer) = Ref(q)
 
 (q::AbstractQuantizer)(x) = forward_pass(q, x)
 
-forward_pass(q::AbstractQuantizer, x::AbstractArray) = forward_pass.(q, x)
-function forward_pass(q::AbstractQuantizer, x::AbstractArray{Union{Missing, T}}) where T
+function forward_pass(q::AbstractQuantizer, x)
+    T = truetype(x)
     return T.(forward_pass.(q, x))
 end
 
-pullback(q::AbstractQuantizer, x::AbstractArray) = pullback.(q, x)
-function pullback(q::AbstractQuantizer, x::AbstractArray{Union{Missing, T}}) where T
+function pullback(q::AbstractQuantizer, x)
+    T = truetype(x)
     return T.(pullback.(q, x))
 end
 
