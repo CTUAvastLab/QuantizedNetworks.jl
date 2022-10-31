@@ -14,4 +14,5 @@ using QuantizedNetworks.Zygote
 @testset "quantizers" begin include("quantizers.jl"); end
 
 @testset "layers/quantdense" begin include("layers/quantdense.jl"); end
-@testset "layers/fquantizer" begin include("layers/featurequantizer.jl"); end
+@testset "layers/fquantizer" begin include("layers/fquantizer.jl"); end
+@testset "layers/featurequantizer" begin include("layers/featurequantizer.jl"); end
