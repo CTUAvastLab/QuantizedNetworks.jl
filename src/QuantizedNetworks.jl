@@ -15,7 +15,7 @@ using NNlib: hardtanh
 export ClippedArray, L0Gate
 export AbstractEstimator, STE, PolynomialSTE, SwishSTE
 export AbstractQuantizer, Sign, Heaviside, Ternary
-export QuantDense, FQuantizer
+export QuantDense, FQuantizer, FeatureQuantizer
 export Bop, CaseOptimizer, isbinary
 
 include("clippedarray.jl")
@@ -25,5 +25,6 @@ include("quantizers.jl")
 include("bop.jl")
 include("layers/quantdense.jl")
 include("layers/fquantizer.jl")
+include("layers/featurequantizer.jl")
 
 end # module QuantizedNetworks
