@@ -4,11 +4,21 @@ Base.broadcastable(q::AbstractQuantizer) = Ref(q)
 
 (q::AbstractQuantizer)(x) = forward_pass(q, x)
 
+"""
+    forward_pass(q::Quantizer, x)
+
+Applies quantizer `q` to value `x`.
+"""
 function forward_pass(q::AbstractQuantizer, x)
     T = truetype(x)
     return T.(forward_pass.(q, x))
 end
 
+"""
+    pullback(q::Quantizer, x)
+
+Returns gradient of `q` with respect to `x`.
+"""
 function pullback(q::AbstractQuantizer, x)
     T = truetype(x)
     return T.(pullback.(q, x))
@@ -23,20 +33,6 @@ function ChainRulesCore.rrule(q::AbstractQuantizer, x)
     end
     return y, quantizer_pullback
 end
-
-"""
-    forward_pass(q::Quantizer, x::Real)
-
-Applies quantizer `q` to value `x`.
-"""
-function forward_pass end
-
-"""
-    pullback(q::Quantizer, x::Real)
-
-Returns gradient of `q` with respect to `x`
-"""
-function pullback end
 
 """
     Sign(estimator)
