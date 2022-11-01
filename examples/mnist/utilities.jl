@@ -61,8 +61,8 @@ function train_model(model, opt, train, test; epochs::Int = 30)
         showvalues = [
             (:acc_train_0, round(100 * history.train_acc[1]; digits = 2)),
             (:acc_train, round(100 * history.train_acc[end]; digits = 2)),
-            (:acc_train_0, round(100 * history.test_acc[1]; digits = 2)),
-            (:acc_train, round(100 * history.test_acc[end]; digits = 2)),
+            (:acc_test_0, round(100 * history.test_acc[1]; digits = 2)),
+            (:acc_test, round(100 * history.test_acc[end]; digits = 2)),
         ]
         ProgressMeter.next!(p; showvalues)
     end
