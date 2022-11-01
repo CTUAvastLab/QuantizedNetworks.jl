@@ -21,7 +21,7 @@ function QuantDense(
 
     return QuantDense(
         weight,
-        _create_bias(weight, bias, size(weight,1)),
+        create_bias(weight, bias, size(weight,1)),
         batchnorm ? identity : σ,
         weight_quantizer,
         weight_sparsifier,

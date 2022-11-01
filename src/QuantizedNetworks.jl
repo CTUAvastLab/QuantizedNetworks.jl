@@ -8,7 +8,7 @@ using Zygote
 
 using Base: RefValue
 using ChainRulesCore: rrule, @scalar_rule, NoTangent, ProjectTo
-using Flux: glorot_uniform, @functor, _create_bias
+using Flux: glorot_uniform, @functor, create_bias
 using Flux.Optimise: AbstractOptimiser, apply!
 using NNlib: hardtanh
 
