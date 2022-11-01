@@ -51,6 +51,9 @@ function _forward_pass(w, b, x)
 end
 
 function ChainRulesCore.rrule(::typeof(_forward_pass), w, b, x)
+    project_w = ProjectTo(w)
+    project_b = ProjectTo(b)
+    project_x = ProjectTo(x)
 
     function FeatureQuantizer_pullback(Δy)
         Δw, Δb, Δx = zero.((w, b, x))
@@ -64,7 +67,7 @@ function ChainRulesCore.rrule(::typeof(_forward_pass), w, b, x)
                 end
             end
         end
-        return NoTangent(), Δw, Δb, Δx
+        return NoTangent(), project_w(Δw), project_b(Δb), project_x(Δx)
     end
     return _forward_pass(w, b, x), FeatureQuantizer_pullback
 end
