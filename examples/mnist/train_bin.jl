@@ -16,10 +16,11 @@ train, test = createloader(dataset; batchsize = 256)
 # model
 input_size = size(first(train)[1], 1)
 nclasses = size(first(train)[2], 1)
+nhidden = 256
 
 model = Chain(
-    Dense(input_size => 32, relu),
-    Dense(32 => nclasses),
+    Dense(input_size => nhidden, relu),
+    Dense(nhidden => nclasses),
 )
 
 σ = hardtanh
@@ -31,12 +32,12 @@ kwargs = (;
 
 model_bin = Chain(
     x -> Float32.(ifelse.(x .> 0, 1, -1)),
-    QuantDense(input_size => 32, σ; kwargs...),
-    QuantDense(32 => nclasses; kwargs...),
+    QuantDense(input_size => nhidden, σ; kwargs...),
+    QuantDense(nhidden => nclasses; kwargs...),
 )
 
 # training
-epochs = 30
+epochs = 15
 
 history = train_model(model, AdaBelief(), train, test; epochs)
 history_bin = train_model(model_bin, AdaBelief(), train, test; epochs)
