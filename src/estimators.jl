@@ -25,3 +25,7 @@ struct SwishSTE{T} <: AbstractEstimator
 end
 
 Base.show(io::IO, e::SwishSTE) = print(io, "SwishSTE($(e.β))")
+
+struct StochasticSTE <: AbstractEstimator end
+
+Base.show(io::IO, ::StochasticSTE) = print(io, "StochasticSTE")

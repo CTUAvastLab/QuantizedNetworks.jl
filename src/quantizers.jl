@@ -71,6 +71,13 @@ function pullback(q::Sign{<:SwishSTE}, x::T)::T where {T<:Real}
     return (β*(2 - β*x*tanh((β*x)/2)))/(1 + cosh(β * x))
 end
 
+function ChainRulesCore.rrule(q::Sign{<:StochasticSTE}, x)
+    T = truetype(x)
+    y = q(x .+ (2 .* rand(T, size(x)) .- 1))
+
+    return y, Δy -> (NoTangent(), Δy)
+end
+
 """
     Heaviside(estimtor)
 

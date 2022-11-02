@@ -13,7 +13,7 @@ using Flux.Optimise: AbstractOptimiser, apply!
 using NNlib: hardtanh
 
 export ClippedArray, L0Gate
-export AbstractEstimator, STE, PolynomialSTE, SwishSTE
+export AbstractEstimator, STE, PolynomialSTE, SwishSTE, StochasticSTE
 export AbstractQuantizer, Sign, Heaviside, Ternary
 export QuantDense, FQuantizer, FeatureQuantizer, MissingQuantizer
 export Bop, CaseOptimizer, isbinary
