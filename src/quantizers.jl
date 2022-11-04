@@ -53,6 +53,7 @@ end
 
 Base.show(io::IO, q::Sign) = print(io, "Sign($(q.estimator))")
 
+NNlib.fast_act(f::Sign, x::AbstractArray) = f
 forward_pass(::Sign, x::Missing) = -1
 forward_pass(::Sign, x::Real) = ifelse(x < 0, -one(x), one(x))
 
@@ -92,7 +93,7 @@ struct Heaviside{E<:AbstractEstimator} <: AbstractQuantizer{E}
 end
 
 Base.show(io::IO, q::Heaviside) = print(io, "Heaviside($(q.estimator))")
-
+NNlib.fast_act(f::Heaviside, x::AbstractArray) = f
 forward_pass(::Heaviside, x::Missing) = 0
 forward_pass(::Heaviside, x::Real) = ifelse(x < 0, zero(x), one(x))
 
