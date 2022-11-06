@@ -64,11 +64,12 @@ savefig(plt, "$(dataset).png")
 
 
 #######
-#   LEt's try to explain an input 
+#   Let's try to explain an input 
 #######
 using NuLog
 input = train.data[1][:,1]
 input = round.(Int, (2 .* input .- 1))
 r = NuLog.Input11()
-output = NuLog.literalvec(r, Int.(model(input)))
-e = NuLog.backward_explanation(r, model_bin, input, output)
+output = model(input)
+p = NuLog.MatchSoftmax(output)
+e = NuLog.backward_explanation(r, model_bin, input, p)

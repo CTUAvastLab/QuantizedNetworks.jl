@@ -91,3 +91,13 @@ function Base.show(io::IO, l::QuantDense)
     l.batchnorm == identity || push!(kwargs, "batchnorm=false")
     print(io, "; ", join(kwargs, ", "), ")")
 end
+
+function nn2logic(layer::QuantDense)
+    bn = layer.batchnorm
+    W = layer.weight_quantizer(layer.weight)
+    W = layer.weight_sparsifier(W)
+    b = bn.β .* sqrt.(bn.σ² .+ bn.ϵ) ./ bn.γ .- bn.μ
+    b = floor.(b) .+ 0.5
+    Dense(W, b, layer.output_quantizer)
+end
+
