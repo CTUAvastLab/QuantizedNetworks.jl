@@ -38,9 +38,10 @@ model_bin = Chain(
 
 # training
 epochs = 15
+loss = logitcrossentropy
 
-history = train_model(model, AdaBelief(), train, test; epochs)
-history_bin = train_model(model_bin, AdaBelief(), train, test; epochs)
+history = train_model(model, AdaBelief(), train, test; epochs, loss)
+history_bin = train_model(model_bin, AdaBelief(), train, test; epochs, loss)
 
 # plots
 plt1 = plot(history.train_acc; label = "normal model", title = "Train $(dataset)");
@@ -63,13 +64,13 @@ plt = plot(
 savefig(plt, "$(dataset).png")
 
 
-#######
-#   Let's try to explain an input 
-#######
-using NuLog
-input = train.data[1][:,1]
-input = round.(Int, (2 .* input .- 1))
-r = NuLog.Input11()
-output = model(input)
-p = NuLog.MatchSoftmax(output)
-e = NuLog.backward_explanation(r, model_bin, input, p)
+# #######
+# #   Let's try to explain an input
+# #######
+# using NuLog
+# input = train.data[1][:,1]
+# input = round.(Int, (2 .* input .- 1))
+# r = NuLog.Input11()
+# output = model(input)
+# p = NuLog.MatchSoftmax(output)
+# e = NuLog.backward_explanation(r, model_bin, input, p)

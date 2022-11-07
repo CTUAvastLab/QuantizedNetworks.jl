@@ -4,7 +4,7 @@ using ProgressMeter
 
 using QuantizedNetworks.Flux.Data: DataLoader
 using QuantizedNetworks.Flux: onehotbatch, onecold
-using QuantizedNetworks.Flux.Losses: logitcrossentropy
+using QuantizedNetworks.Flux.Losses: logitcrossentropy, mse
 using QuantizedNetworks.Flux.Optimise: update!
 
 # data creation
@@ -56,7 +56,7 @@ function accuracy(data_loader, model)
 end
 
 # train loop
-function train_model(model, opt, train, test; epochs::Int = 30)
+function train_model(model, opt, train, test; loss = logitcrossentropy, epochs::Int = 30)
     p = Progress(epochs, 1)
     ps = Flux.params(model)
     history = (
@@ -66,7 +66,7 @@ function train_model(model, opt, train, test; epochs::Int = 30)
 
     for _ in 1:epochs
         for (x, y) in train
-            gs = gradient(() -> logitcrossentropy(model(x), y), ps)
+            gs = gradient(() -> loss(model(x), y), ps)
             update!(opt, ps, gs)
         end
 

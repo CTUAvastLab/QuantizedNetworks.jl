@@ -37,9 +37,10 @@ model_bin = Chain(
 
 # training
 epochs = 15
+loss = logitcrossentropy
 
-history = train_model(model, AdaBelief(), train, test; epochs)
-history_bin = train_model(model_bin, AdaBelief(), train, test; epochs)
+history = train_model(model, AdaBelief(), train, test; epochs, loss)
+history_bin = train_model(model_bin, AdaBelief(), train, test; epochs, loss)
 
 # plots
 plt1 = plot(history.train_acc; label = "normal model", title = "Train $(dataset)");
