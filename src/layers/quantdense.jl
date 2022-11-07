@@ -88,7 +88,7 @@ function Base.show(io::IO, l::QuantDense)
     end
     push!(kwargs, "$(l.weight_quantizer)")
     push!(kwargs, "$(l.output_quantizer)")
-    l.batchnorm == identity || push!(kwargs, "batchnorm=false")
+    l.batchnorm == identity && push!(kwargs, "batchnorm=false")
     print(io, "; ", join(kwargs, ", "), ")")
 end
 
@@ -100,4 +100,3 @@ function nn2logic(layer::QuantDense)
     b = floor.(b) .+ 0.5
     Dense(W, b, layer.output_quantizer)
 end
-
