@@ -111,7 +111,7 @@ struct Ternary{E<:AbstractEstimator, T} <: AbstractQuantizer{E}
     Δ::T
     estimator::E
 
-    function Ternary(Δ::T = 0.005, estimator::E = STE()) where {T, E}
+    function Ternary(Δ::T = 0.05, estimator::E = STE()) where {T, E}
         Δ > 0 || throw(ArgumentError("`Δ` must be positive"))
         return new{E, T}(Δ, estimator)
     end
@@ -121,7 +121,7 @@ Base.show(io::IO, q::Ternary) = print(io, "Ternary$((q.Δ, q.estimator))")
 
 forward_pass(::Ternary, x::Missing) = -1
 function forward_pass(q::Ternary, x::Real)
-    return if x < q.Δ
+    return if x < -q.Δ
         -one(x)
     elseif x > q.Δ
         one(x)
