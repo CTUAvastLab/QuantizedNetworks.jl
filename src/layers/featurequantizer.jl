@@ -26,7 +26,9 @@ function FeatureQuantizer(
 end
 
 function Base.show(io::IO, q::FeatureQuantizer)
-    print(io, "FeatureQuantizer(", size(q.weight, 1), " => ", prod(size(q.weight)), ")")
+    print(io, "FeatureQuantizer(")
+    print(io, size(q.weight, 1), " => ", prod(size(q.weight)))
+    print(io, "; quantizer=$(q.output_quantizer))")
 end
 
 function (q::FeatureQuantizer)(x)
