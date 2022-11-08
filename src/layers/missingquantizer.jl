@@ -1,8 +1,8 @@
 struct MissingQuantizer{Q}
-    output_quantizer::Q
-
-    MissingQuantizer(; output_quantizer::Q = Sign()) where {Q} = new{Q}(output_quantizer)
+    quantizer::Q
 end
+
+MissingQuantizer(; quantizer = Sign()) = MissingQuantizer(quantizer)
 
 Flux.@functor MissingQuantizer
 
