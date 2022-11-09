@@ -18,7 +18,7 @@ export AbstractQuantizer, Sign, Heaviside, Ternary
 export QuantDense, FQuantizer, FeatureQuantizer, MissingQuantizer
 export Bop, CaseOptimizer, isbinary
 
-include("utilities.jl")
+
 include("clippedarray.jl")
 include("l0gate.jl")
 include("estimators.jl")

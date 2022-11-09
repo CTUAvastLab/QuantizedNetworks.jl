@@ -7,7 +7,7 @@ MissingQuantizer(; quantizer = Sign()) = MissingQuantizer(quantizer)
 Flux.@functor MissingQuantizer
 
 function (q::MissingQuantizer)(x)
-    T = truetype(x)
+    T = nonmissingtype(eltype(x))
     return q.quantizer(ifelse.(ismissing.(x), -one(T), one(T)))
 end
 

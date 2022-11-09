@@ -11,7 +11,7 @@ NNlib.fast_act(q::AbstractQuantizer, ::AbstractArray) = q
 Applies quantizer `q` to value `x`.
 """
 function forward_pass(q::AbstractQuantizer, x)
-    T = truetype(x)
+    T = nonmissingtype(eltype(x))
     return T.(forward_pass.(q, x))
 end
 
@@ -21,7 +21,7 @@ end
 Returns gradient of `q` with respect to `x`.
 """
 function pullback(q::AbstractQuantizer, x)
-    T = truetype(x)
+    T = nonmissingtype(eltype(x))
     return T.(pullback.(q, x))
 end
 
@@ -73,7 +73,7 @@ function pullback(q::Sign{<:SwishSTE}, x::T)::T where {T<:Real}
 end
 
 function ChainRulesCore.rrule(q::Sign{<:StochasticSTE}, x)
-    T = truetype(x)
+    T = nonmissingtype(eltype(x))
     y = q(x .+ (2 .* rand(T, size(x)) .- 1))
 
     return y, Δy -> (NoTangent(), Δy)
