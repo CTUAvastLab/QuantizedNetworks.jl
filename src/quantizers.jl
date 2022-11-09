@@ -94,7 +94,7 @@ end
 
 Base.show(io::IO, q::Heaviside) = print(io, "Heaviside($(q.estimator))")
 forward_pass(::Heaviside, x::Missing) = 0
-forward_pass(::Heaviside, x::Real) = ifelse(x < 0, zero(x), one(x))
+forward_pass(::Heaviside, x::Real) = ifelse(x <= 0, zero(x), one(x))
 
 pullback(q::Heaviside, x::Missing) = 0
 function pullback(q::Heaviside{<:STE}, x::T)::T where {T<:Real}
