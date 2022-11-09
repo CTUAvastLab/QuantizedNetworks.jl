@@ -119,7 +119,7 @@ end
 
 Base.show(io::IO, q::Ternary) = print(io, "Ternary$((q.Δ, q.estimator))")
 
-forward_pass(::Ternary, x::Missing) = -1
+forward_pass(::Ternary, x::Missing) = 0
 function forward_pass(q::Ternary, x::Real)
     return if x < -q.Δ
         -one(x)
