@@ -1,31 +1,93 @@
 using QuantizedNetworks: forward_pass, pullback
 
-# Sign function
-@testset "Sign quantizer" begin
-    Ts = [Float64, Float32]
-    inputs_real = [-5, -2, -1, -0.5,  0, 0.5, 1, 2, 5]
-    inputs_missing = [-5, -2, -1, -0.5,  0, 0.5, 1, 2, 5]
-    outputs = [-1, -1, -1, -1, 1, 1, 1, 1, 1]
-    quantizers = [
-        (Sign(), [0, 1, 1, 1, 1, 1, 1, 1, 0]),
-        (Sign(STE()), [0, 1, 1, 1, 1, 1, 1, 1, 0]),
-        (Sign(STE(1)), [0, 0, 1, 1, 1, 1, 1, 0, 0]),
-        (Sign(STE(2)), [0, 1, 1, 1, 1, 1, 1, 1, 0]),
-        (Sign(PolynomialSTE()), [0, 0, 0, 1, 2, 1, 0, 0, 0]),
-        (Sign(SwishSTE()), nothing),
-        (Sign(SwishSTE(5)), nothing),
-        (Sign(SwishSTE(10)), nothing),
-    ]
+Ts = [Float16, Float32, Float64]
+inputs_real = [-5, -2, -1, -0.5, 0, 0.5, 1, 2, 5]
+inputs_missing = [-5, -2, -1, -0.5, missing, 0.5, 1, 2, missing]
 
+test_values = [
+(
+    (Sign(), Sign(STE()), Sign(STE(2))),
+    (
+        (inputs_real, [-1, -1, -1, -1, 1, 1, 1, 1, 1], [0, 1, 1, 1, 1, 1, 1, 1, 0]),
+        (inputs_missing, [-1, -1, -1, -1, -1, 1, 1, 1, -1], [0, 1, 1, 1, 0, 1, 1, 1, 0]),
+    ),
+),
+(
+    (Sign(STE()), ),
+    (
+        (inputs_real, [-1, -1, -1, -1, 1, 1, 1, 1, 1], [0, 1, 1, 1, 1, 1, 1, 1, 0]),
+        (inputs_missing, [-1, -1, -1, -1, -1, 1, 1, 1, -1], [0, 1, 1, 1, 0, 1, 1, 1, 0]),
+    ),
+),
+(
+    (Sign(PolynomialSTE()),),
+    (
+        (inputs_real, [-1, -1, -1, -1, 1, 1, 1, 1, 1], [0, 0, 0, 1, 2, 1, 0, 0, 0]),
+        (inputs_missing, [-1, -1, -1, -1, -1, 1, 1, 1, -1], [0, 0, 0, 1, 0, 1, 0, 0, 0]),
+    ),
+),
+(
+    (Sign(SwishSTE()), Sign(SwishSTE(5)), Sign(SwishSTE(10))),
+    (
+        (inputs_real, [-1, -1, -1, -1, 1, 1, 1, 1, 1], nothing),
+        (inputs_missing, [-1, -1, -1, -1, -1, 1, 1, 1, -1], nothing),
+    ),
+),
+(
+    (Heaviside(), Heaviside(STE()), Heaviside(STE(2))),
+    (
+        (inputs_real, [0, 0, 0, 0, 1, 1, 1, 1, 1], [0, 1, 1, 1, 1, 1, 1, 1, 0]),
+        (inputs_missing, [0, 0, 0, 0, 0, 1, 1, 1, 0], [0, 1, 1, 1, 0, 1, 1, 1, 0]),
+    ),
+),
+(
+    (Heaviside(STE(1)),),
+    (
+        (inputs_real, [0, 0, 0, 0, 1, 1, 1, 1, 1], [0, 0, 1, 1, 1, 1, 1, 0, 0]),
+        (inputs_missing, [0, 0, 0, 0, 0, 1, 1, 1, 0], [0, 0, 1, 1, 0, 1, 1, 0, 0]),
+    ),
+),
+(
+    (Ternary(), Ternary(0.05, STE(2)), Ternary(0.05, STE(2))),
+    (
+        (inputs_real, [-1, -1, -1, -1, 0, 1, 1, 1, 1], [0, 1, 1, 1, 1, 1, 1, 1, 0]),
+        (inputs_missing, [-1, -1, -1, -1, 0, 1, 1, 1, 0], [0, 1, 1, 1, 0, 1, 1, 1, 0]),
+    ),
+),
+(
+    (Ternary(0.05, STE(1)),),
+    (
+        (inputs_real, [-1, -1, -1, -1, 0, 1, 1, 1, 1], [0, 0, 1, 1, 1, 1, 1, 0, 0]),
+        (inputs_missing, [-1, -1, -1, -1, 0, 1, 1, 1, 0], [0, 0, 1, 1, 0, 1, 1, 0, 0]),
+    ),
+),
+(
+    (Ternary(0.6), Ternary(0.6, STE()), Ternary(0.6, STE(2))),
+    (
+        (inputs_real, [-1, -1, -1, 0, 0, 0, 1, 1, 1], [0, 1, 1, 1, 1, 1, 1, 1, 0]),
+        (inputs_missing, [-1, -1, -1, 0, 0, 0, 1, 1, 0], [0, 1, 1, 1, 0, 1, 1, 1, 0]),
+    ),
+),
+(
+    (Ternary(0.6, STE(1)),),
+    (
+        (inputs_real, [-1, -1, -1, 0, 0, 0, 1, 1, 1], [0, 0, 1, 1, 1, 1, 1, 0, 0]),
+        (inputs_missing, [-1, -1, -1, 0, 0, 0, 1, 1, 0], [0, 0, 1, 1, 0, 1, 1, 0, 0]),
+    ),
+),
+]
+
+# Quantizers
+for (quantizers, inouts) in test_values
     # forward pass
-    @testset "inputs = $(inputs)" for inputs in [inputs_real, inputs_missing]
+    @testset "Quantizer: $(q)" for q in quantizers
         @testset "input_type = $(T)" for T in Ts
-            @testset "Quantizer: $(q)" for (q, outputs_pullback) in quantizers
+            @testset "inputs = $(inputs)" for (inputs, outputs, outputs_pullback) in inouts
                 contains_missing = any(ismissing, inputs)
 
                 # inputs/outputs conversion
                 if contains_missing
-                    xt = convert(Vector{Union{T, Missing}}, inputs)
+                    xt = convert(Vector{Union{T,Missing}}, inputs)
                 else
                     xt = T.(inputs)
                 end
@@ -55,7 +117,7 @@ using QuantizedNetworks: forward_pass, pullback
                         @test pullback(q, x) ≈ Δy
                     end
 
-                    @test isa(pullback.(q, xt), Vector{T})
+                    @test isa(pullback(q, xt), Vector{T})
                     @test pullback(q, xt) ≈ Δyt
                     @test gradient(x -> sum(q(x)), xt)[1] ≈ Δyt
                 end
