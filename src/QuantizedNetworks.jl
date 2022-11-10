@@ -15,9 +15,11 @@ using NNlib: hardtanh
 export ClippedArray, L0Gate
 export AbstractEstimator, STE, PolynomialSTE, SwishSTE, StochasticSTE
 export AbstractQuantizer, Sign, Heaviside, Ternary
-export QuantDense, FQuantizer, FeatureQuantizer, MissingQuantizer
+export QuantDense, FQuantizer
 export Bop, CaseOptimizer, isbinary
 
+export QuantizedDense, FeatureQuantizer, MissingQuantizer
+export AbstractBlock, DenseBlock, FeatureBlock
 
 include("clippedarray.jl")
 include("l0gate.jl")
@@ -30,5 +32,13 @@ include("layers/quantizeddense.jl")
 include("layers/fquantizer.jl")
 include("layers/featurequantizer.jl")
 include("layers/missingquantizer.jl")
+
+abstract type AbstractBlock end
+
+(m::AbstractBlock)(x) = m.layers(x)
+Base.getindex(m::AbstractBlock, inds) = m.layers[inds]
+
+include("blocks/denseblock.jl")
+include("blocks/featureblock.jl")
 
 end # module QuantizedNetworks
