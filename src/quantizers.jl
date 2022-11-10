@@ -61,8 +61,8 @@ clip(x) = \begin{cases}
 ```
 with the gradient is defined as a clipped identity
 ```math
-\frac{\partial clip{\partial x} = \begin{cases}
-    1 & \left|x\right| \leq \text{threshold} \\\
+\frac{\partial clip}{\partial x} = \begin{cases}
+    1 & \left|x\right| \leq \text{threshold} \\
     0 & \left|x\right| > \text{threshold}
 \end{cases}
 ```
@@ -77,7 +77,7 @@ poly(x) = \begin{cases}
 ```
 with the gradient is defined as
 ```math
-\frac{\partial poly{\partial x} = \begin{cases}
+\frac{\partial poly}{\partial x} = \begin{cases}
     2 + 2x & -1 \leq x < 0 \\
     2 - 2x & 0 \leq x < 1 \\
     0 & \text{otherwise}
@@ -89,8 +89,8 @@ sswish_{\beta}(x) = 2\sigma(\beta x) \left(1 + \beta x (1 - \sigma(\beta x))\rig
 ```
 where $\sigma(x)$ is the sigmoid function and $\beta > 0$ controls how fast the function asymptotes to `−1` and `+1`. The gradient is defined as
 ```math
-\frac{\partial sswish_{\beta}{\partial x} = \frac{\beta\left\\{2-\beta x \tanh \left(\frac{\beta x}{2}\right)\right\\}}{1+\cosh (\beta x)}
-\end{cases}
+\frac{\partial sswish_{\beta}}{\partial x} =
+\frac{\beta\left( 2-\beta x \tanh \left(\frac{\beta x}{2}\right) \right)}{1+\cosh (\beta x)}
 ```
 
 # References
@@ -198,7 +198,7 @@ clip(x) = \begin{cases}
 ```
 with the gradient is defined as a clipped identity
 ```math
-\frac{\partial clip{\partial x} = \begin{cases}
+\frac{\partial clip}{\partial x} = \begin{cases}
     1 & \left|x\right| \leq \text{threshold} \\\
     0 & \left|x\right| > \text{threshold}
 \end{cases}
@@ -257,8 +257,8 @@ end
 deterministic ternary quantizer that return `-1` when the given input is less than `Δ`, `1` whe the input in greater than Δ, and `0` otherwise. For `Missing` input, the output is `0`.
 ```math
 ternary(x) = \begin{cases}
-    -1 & x \le \Delta
-    1 & x \ge \Delta \\
+    -1 & x < -\Delta \\
+    1 & x > \Delta \\
     0 & \text{otherwise}
 \end{cases}
 ```
@@ -278,7 +278,7 @@ clip(x) = \begin{cases}
 ```
 with the gradient is defined as a clipped identity
 ```math
-\frac{\partial clip{\partial x} = \begin{cases}
+\frac{\partial clip}{\partial x} = \begin{cases}
     1 & \left|x\right| \leq \text{threshold} \\\
     -1 & \left|x\right| > \text{threshold}
 \end{cases}
