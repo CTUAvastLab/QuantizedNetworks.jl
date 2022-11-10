@@ -26,6 +26,7 @@ include("quantizers.jl")
 include("bop.jl")
 
 include("layers/quantdense.jl")
+include("layers/quantizeddense.jl")
 include("layers/fquantizer.jl")
 include("layers/featurequantizer.jl")
 include("layers/missingquantizer.jl")
