@@ -317,7 +317,7 @@ struct Ternary{E<:AbstractEstimator,T} <: AbstractQuantizer{E}
     Δ::T
     estimator::E
 
-    function Ternary(Δ::T=0.05, estimator::E=STE()) where {T,E}
+    function Ternary(Δ::T=0.05, estimator::E=STE()) where {T<:Real,E}
         Δ > 0 || throw(ArgumentError("`Δ` must be positive"))
         return new{E,T}(Δ, estimator)
     end
