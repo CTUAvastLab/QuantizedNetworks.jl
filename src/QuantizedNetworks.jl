@@ -18,7 +18,7 @@ export AbstractQuantizer, Sign, Heaviside, Ternary
 export QuantDense, FQuantizer
 export Bop, CaseOptimizer, isbinary
 
-export QuantizedDense, FeatureQuantizer, MissingQuantizer
+export QuantizedDense, FeatureQuantizer
 export AbstractBlock, DenseBlock, FeatureBlock
 
 include("clippedarray.jl")
@@ -31,7 +31,6 @@ include("layers/quantdense.jl")
 include("layers/quantizeddense.jl")
 include("layers/fquantizer.jl")
 include("layers/featurequantizer.jl")
-include("layers/missingquantizer.jl")
 
 abstract type AbstractBlock end
 
