@@ -7,3 +7,6 @@ Manifest.toml
 **tmp/
 **.vscode/
 *.png
+
+/docs/build/
+/docs/site/
