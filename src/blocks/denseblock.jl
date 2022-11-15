@@ -21,7 +21,6 @@ function DenseBlock(
         batchnorm ? BatchNorm(out, σ) : identity,
         output_quantizer,
     ))
-
 end
 
 @functor DenseBlock
