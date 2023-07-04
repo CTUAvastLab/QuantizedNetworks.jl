@@ -36,6 +36,10 @@ function (q::FeatureQuantizer)(x)
     return q.output_quantizer(y)
 end
 
+function _forward_pass(w, b, x::AbstractVector)
+    return vec(_forward_pass(w, b, reshape(x, length(x), 1)))
+end
+
 function _forward_pass(w, b, x)
     w1, b1, x1 = size(w, 1), size(b, 1), size(x, 1)
     if !(w1 == b1 == x1)
