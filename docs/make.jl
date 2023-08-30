@@ -20,7 +20,7 @@ api = joinpath.("./api/", [
 
 makedocs(
     sitename = "QuantizedNetworks",
-    format = Documenter.HTML(),
+    format = Documenter.HTML(prettyurls=false),
     modules = [QuantizedNetworks],
     pages = [
         "Home" => "index.md",
