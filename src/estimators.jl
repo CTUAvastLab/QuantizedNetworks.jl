@@ -11,7 +11,11 @@ abstract type AbstractEstimator end
 @doc raw"""
     STE(threshold::Real = 2)
 
-For more details see [`AbstractEstimator`](@ref), [`Sign`](@ref), [`Heaviside`](@ref) or [`Ternary`](@ref).
+It is the simplest estimator used in all quantizers like [`Sign`](@ref), [`Heaviside`](@ref) or [`Ternary`](@ref).
+
+It requires a real positive number for threshold parameter, in case a negative number is supplied an `ArgumentError` exception is thrown.
+
+Threshold is used, in the `pullback` function, to determine the range of values for which the gradient is calculated by an estimation function. [`Sign`](@ref)
 """
 struct STE{T<:Real} <: AbstractEstimator
     threshold::T
@@ -27,7 +31,9 @@ Base.show(io::IO, e::STE) = print(io, "STE($(e.threshold))")
 @doc raw"""
     PolynomialSTE()
 
-For more details see [`AbstractEstimator`](@ref) or [`Sign`](@ref).
+Currently is only supported for binary [`Sign`](@ref) quantizer. 
+
+Does not require any additional parameters, simply indicates that a polynomial approximation of sign function is used and its respective derivative.
 """
 struct PolynomialSTE <: AbstractEstimator end
 
@@ -37,7 +43,11 @@ Base.show(io::IO, ::PolynomialSTE) = print(io, "PolynomialSTE")
 @doc raw"""
     SwishSTE(β:Real = 5)
 
-For more details see [`AbstractEstimator`](@ref) or [`Sign`](@ref).
+Currently is only supported for binary [`Sign`](@ref) quantizer. 
+
+It requires a real positive number for β parameter, in case a negative number is supplied an `ArgumentError` exception is thrown.
+
+β is used as the parameter in the calculation of the swish function and its derivative in the `pullback` function. [`Sign`](@ref)
 """
 struct SwishSTE{T} <: AbstractEstimator
     β::T
@@ -53,7 +63,7 @@ Base.show(io::IO, e::SwishSTE) = print(io, "SwishSTE($(e.β))")
 @doc raw"""
     StochasticSTE()
 
-For more details see [`AbstractEstimator`](@ref) or [`Sign`](@ref).
+To be defined.
 """
 struct StochasticSTE <: AbstractEstimator end
 
