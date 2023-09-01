@@ -1,7 +1,10 @@
 @doc raw"""
     AbstractEstimator
 
-Estimators are used for estimation of the gradient of quantizers for whic the true gradient does not exist. Estimators are used for dispatch on backward pass, i.e. for each quantizer (for example [`Sign`](@ref)) and estimator it is necessary to define specific method for [`pullback`](@ref) function.
+Estimators are used for estimation of the gradient of quantizers for which the true gradient does not exist.
+
+Estimators are used for dispatch on backward pass, i.e. for each quantizer (for example [`Sign`](@ref)) 
+and it is necessary to define specific method for [`pullback`](@ref) function.
 """
 abstract type AbstractEstimator end
 

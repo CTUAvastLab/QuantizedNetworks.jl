@@ -1,3 +1,11 @@
+@doc raw"""
+    AbstractQuantizer
+
+Quantizers are used to limit the range of possible numerical values. 
+Useful for quantizing neural networks, to work on hardware with limited computational resources.
+
+Quantizer type objects are also functors, i.e. can be called as a function directly supplying the input data and it is the equivalent of calling `forward_pass`.
+"""
 abstract type AbstractQuantizer{E<:AbstractEstimator} end
 
 Base.broadcastable(q::AbstractQuantizer) = Ref(q)
@@ -5,25 +13,27 @@ NNlib.fast_act(q::AbstractQuantizer, ::AbstractArray) = q
 
 (q::AbstractQuantizer)(x) = forward_pass(q, x)
 
-"""
-    forward_pass(q::Quantizer, x)
+@doc raw"""
+    forward_pass(q::AbstractQuantizer, x)
 
-Applies quantizer `q` to value `x`.
+Applies quantizer to Array type `x`, so each value of `x` will be quantized.
 """
 function forward_pass(q::AbstractQuantizer, x)
     T = nonmissingtype(eltype(x))
     return T.(forward_pass.(q, x))
 end
 
-"""
-    pullback(q::Quantizer, x)
+@doc raw"""
+    pullback(q::AbstractQuantizer, x)
 
-Returns gradient of `q` with respect to `x`.
+Returns gradient of the selected quantizer, with respect to `x`, by estimating the quantizing function and using the derivative of that estimation to calculate the gradient.
 """
 function pullback(q::AbstractQuantizer, x)
     T = nonmissingtype(eltype(x))
     return T.(pullback.(q, x))
 end
+
+
 
 function ChainRulesCore.rrule(q::AbstractQuantizer, x)
     y = q(x)
@@ -38,20 +48,25 @@ end
 @doc raw"""
     Sign(estimator::AbstractEstimator = STE())
 
-deterministic binary quantizer that return `-1` when the given input is less than zero or `Missing` and `1` otherwise
+Deterministic binary quantizer that returns `-1` when the given input is less than zero or `Missing` and `1` otherwise
+
 ```math
 sign(x) = \begin{cases}
     -1 & x < 0 \\
     1 & x \geq 0
 \end{cases}
 ```
-The type of the inputs is preserved with exception of `Missing` input.
+
+The type of the inputs is preserved with exception of `Missing` input, when it will be quantized into -1.
+
+Quantizers require an estimator to be specified, if none is supplied it will default to Straight Through Estimator `STE`, with default threshold `2`.
 
 # Estimators
 
-Estimators are used to estimate non-existing gradient of the Sign function. They are used only on backward pass.
+Estimators are used to estimate the non-existing gradient of the Sign function. They are used only on backward pass.
 
-- `STE(threshold::Real = 2)`: Straight-Through Estimator approximates the sign function using the clip function
+- `STE(threshold::Real = 2)`: Straight-Through Estimator approximates the sign function using the cliped version of the identity function
+
 ```math
 clip(x) = \begin{cases}
     -1 & x < \text{threshold} \\
@@ -59,14 +74,32 @@ clip(x) = \begin{cases}
     x & \text{otherwise}
 \end{cases}
 ```
-with the gradient is defined as a clipped identity
+
+with the gradient defined as following 
+
 ```math
 \frac{\partial clip}{\partial x} = \begin{cases}
     1 & \left|x\right| \leq \text{threshold} \\
     0 & \left|x\right| > \text{threshold}
 \end{cases}
 ```
+
+The following code plots the quantizer function and the first derivative of its linear estimation. 
+    The threshold represents the range of input values for quantization.
+
+```julia
+using Plots, QuantizedNetworks: forward_pass, pullback
+q = Sign(STE(1.5))
+x = -5:1/100:5
+y = forward_pass(q, x)
+dy = pullback(q, x)
+
+plot(x,y, label = "quantizer", title = "Sign quantizer - STE (threshold = 1.5)")
+plot!(x,dy, label="gradient", line = (:path, 2))
+```
+
 - `PolynomialSTE()`: Polynomial estimater approximates the sign function using the piecewise polynomial function
+
 ```math
 poly(x) = \begin{cases}
     -1 & x < -1 \\
@@ -75,7 +108,9 @@ poly(x) = \begin{cases}
     1 & \text{otherwise}
 \end{cases}
 ```
+
 with the gradient is defined as
+
 ```math
 \frac{\partial poly}{\partial x} = \begin{cases}
     2 + 2x & -1 \leq x < 0 \\
@@ -83,7 +118,21 @@ with the gradient is defined as
     0 & \text{otherwise}
 \end{cases}
 ```
-- `SwishSTE(β=5)`: SignSwish estimator approximates the sign function using the boundes swish function
+
+The following code plots the quantizer function and the first derivative of its polynomial estimation. 
+
+```julia
+using QuantizedNetworks: forward_pass, pullback
+q = Sign(PolynomialSTE())
+x = -5:1/100:5
+y = forward_pass(q, x)
+dy = pullback(q, x)
+
+plot(x,y, label = "quantizer", title = "Sign quantizer - PolynomialSTE")
+plot!(x,dy, label="gradient", line = (:path, 2))
+```
+
+- `SwishSTE(β=5)`: SignSwish estimator approximates the sign function using the boundles swish function
 ```math
 sswish_{\beta}(x) = 2\sigma(\beta x) \left(1 + \beta x (1 - \sigma(\beta x))\right)
 ```
@@ -93,11 +142,19 @@ where $\sigma(x)$ is the sigmoid function and $\beta > 0$ controls how fast the 
 \frac{\beta\left( 2-\beta x \tanh \left(\frac{\beta x}{2}\right) \right)}{1+\cosh (\beta x)}
 ```
 
-# References
+The following code plots the quantizer function and the first derivative of its swish estimation. 
 
-- [`Binarized Neural Networks: Training Deep Neural Networks with Weights and Activations Constrained to +1 or -1`](https://arxiv.org/abs/1602.02830)
-- [`Bi-Real Net: Enhancing the Performance of 1-bit CNNs With Improved Representational Capability and Advanced Training Algorithm`](https://arxiv.org/abs/1808.00278)
-- [`Regularized Binary Network Training`](https://arxiv.org/abs/1812.11800)
+```julia
+using QuantizedNetworks: forward_pass, pullback
+q = Sign(SwishSTE(2))
+x = -5:1/100:5
+y = forward_pass(q, x)
+dy = pullback(q, x)
+
+plot(x,y, label = "quantizer", title = "Sign quantizer - SwishSTE (β = 2)")
+plot!(x,dy, label="gradient", line = (:path, 2))
+```    
+
 
 # Examples
 
@@ -175,7 +232,7 @@ end
 @doc raw"""
     Heaviside(estimator::AbstractEstimator = STE())
 
-deterministic binary quantizer that return `0` when the given input is less than zero or `Missing` and `1` otherwise
+Deterministic binary quantizer that return `0` when the given input is less than zero or `Missing` and `1` otherwise
 ```math
 heaviside(x) = \begin{cases}
     0 & x \leq 0 \\
@@ -203,6 +260,19 @@ with the gradient is defined as a clipped identity
     0 & \left|x\right| > \text{threshold}
 \end{cases}
 ```
+
+The following code plots the heaviside quantizer function and the first derivative of its linear estimation. 
+
+```julia
+using QuantizedNetworks: forward_pass, pullback
+q = Heaviside(STE(3))
+x = -5:1/100:5
+y = forward_pass(q, x)
+dy = pullback(q, x)
+
+plot(x,y, label = "quantizer", title = "Heaviside quantizer - STE (threshold = 3)")
+plot!(x,dy, label="gradient", line = (:path, 2))
+``` 
 
 # Examples
 
@@ -254,7 +324,8 @@ end
 @doc raw"""
     Ternary(Δ::T=0.05, estimator::AbstractEstimator = STE())
 
-deterministic ternary quantizer that return `-1` when the given input is less than `Δ`, `1` whe the input in greater than Δ, and `0` otherwise. For `Missing` input, the output is `0`.
+Deterministic ternary quantizer that return `-1` when the given input is less than `-Δ`, `1` whe the input in greater than Δ, and `0` otherwise. For `Missing` input, the output is `0`.
+
 ```math
 ternary(x) = \begin{cases}
     -1 & x < -\Delta \\
@@ -262,6 +333,7 @@ ternary(x) = \begin{cases}
     0 & \text{otherwise}
 \end{cases}
 ```
+
 The type of the inputs is preserved with exception of `Missing` input.
 
 # Estimators
@@ -282,6 +354,17 @@ with the gradient is defined as a clipped identity
     1 & \left|x\right| \leq \text{threshold} \\\
     -1 & \left|x\right| > \text{threshold}
 \end{cases}
+```
+
+```julia
+using QuantizedNetworks: forward_pass, pullback
+q = Ternary(1.5, STE(3))
+x = -5:1/100:5
+y = forward_pass.(q, x)
+dy = pullback.(q, x)
+
+plot(x,y, label = "quantizer", title = "Ternary quantizer - (Δ=1.5, STE threshold=3)")
+plot!(x,dy, label="gradient", line = (:path, 2))
 ```
 
 # Examples
