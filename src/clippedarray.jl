@@ -1,38 +1,40 @@
-"""
+@doc raw"""
     ClippedArray(x::AbstractArray, lo::Real=-1, hi::Real=1)
     ClippedArray(dims...; lo::Real=-1, hi::Real=1, init = glorot_uniform)
 
-Array type with elements clipped between `lo` and `hi`, defaults to [-1, +1].
+Represents an Array type with elements clipped between `lo` and `hi`, if nothing is set range defaults to [-1, +1]. 
+It still works in the case that `hi` is less then `lo`.
+Supports all standard Array type operations and functions, as well there are type aliases for 2D and 3D arrays (i.e. ClippedVector, ClippedMatrix).
 
 # Examples
 
-    ```jldoctest
-        julia> C = ClippedArray([-4.0, -0.8, 0.1, 1.2], -1, 1.2)
-        4-element ClippedArray{Float64, 1, Vector{Float64}}:
-        -1.0
-        -0.8
-        0.1
-        1.2
+```jldoctest
+julia> C = ClippedArray([-4.0, -0.8, 0.1, 1.2], -1, 1.2)
+4-element ClippedArray{Float64, 1, Vector{Float64}}:
+-1.0
+-0.8
+0.1
+1.2
 
-        julia> C[[2, 4]] = [-2.4, 2.6]
-        2-element Vector{Float64}:
-        -2.4
-        2.6
+julia> C[[2, 4]] = [-2.4, 2.6]
+2-element Vector{Float64}:
+-2.4
+2.6
 
-        julia> C
-        4-element ClippedArray{Float64, 1, Vector{Float64}}:
-        -1.0
-        -1.0
-        0.1
-        1.2
+julia> C
+4-element ClippedArray{Float64, 1, Vector{Float64}}:
+-1.0
+-1.0
+0.1
+1.2
 
-        julia> using Random; Random.seed!(3);
+julia> using Random; Random.seed!(3);
 
-        julia> ClippedArray(2, 3)
-        2×3 ClippedArray{Float32, 2, Matrix{Float32}}:
-        0.843751  -1.0  0.96547
-        -0.351124   1.0  1.0
-    ```
+julia> ClippedArray(2, 3)
+2×3 ClippedArray{Float32, 2, Matrix{Float32}}:
+0.843751  -1.0  0.96547
+-0.351124   1.0  1.0
+```
 """
 mutable struct ClippedArray{T,N,A<:AbstractArray{T,N}} <: AbstractArray{T,N}
     x::A
