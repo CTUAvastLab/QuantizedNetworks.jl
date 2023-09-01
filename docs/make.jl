@@ -14,6 +14,7 @@ DocMeta.setdocmeta!(
 # content
 api = joinpath.("./api/", [
     "utilities.md",
+    "estimators.md",
     "quantizers.md",
     "layers.md",
 ])
