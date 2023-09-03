@@ -1,8 +1,6 @@
-# Layers and Blocks
+# Layers
 
 ```@docs
 QuantizedNetworks.QuantizedDense
-QuantizedNetworks.DenseBlock
 QuantizedNetworks.FeatureQuantizer
-QuantizedNetworks.FeatureBlock
 ```
