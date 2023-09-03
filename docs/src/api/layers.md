@@ -1,6 +1,11 @@
 # Layers
 
+## QuantDense
 ```@docs
-QuantizedNetworks.QuantizedDense
+QuantizedNetworks.QuantDense
+```
+
+## FeatureQuantizer
+```@docs
 QuantizedNetworks.FeatureQuantizer
 ```

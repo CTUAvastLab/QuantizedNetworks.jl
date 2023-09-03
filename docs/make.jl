@@ -1,4 +1,6 @@
 push!(LOAD_PATH,"../src/")
+push!(LOAD_PATH,"../src/layers/")
+
 
 using Documenter
 using QuantizedNetworks
@@ -16,8 +18,7 @@ api = joinpath.("./api/", [
     "utilities.md",
     "estimators.md",
     "quantizers.md",
-    "layers.md",
-    "blocks.md"
+    "layers.md"
 ])
 
 makedocs(
