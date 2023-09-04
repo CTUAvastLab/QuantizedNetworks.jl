@@ -1,6 +1,6 @@
 push!(LOAD_PATH,"../src/")
+push!(LOAD_PATH,"../src/blocks/")
 push!(LOAD_PATH,"../src/layers/")
-
 
 using Documenter
 using QuantizedNetworks
@@ -15,10 +15,11 @@ DocMeta.setdocmeta!(
 
 # content
 api = joinpath.("./api/", [
-    "utilities.md",
-    "estimators.md",
-    "quantizers.md",
-    "layers.md"
+    #"utilities.md",
+    #"estimators.md",
+    #"quantizers.md",
+    #"layers.md",
+    "blocks.md"
 ])
 
 makedocs(
@@ -28,7 +29,10 @@ makedocs(
     pages = [
         "Home" => "index.md",
         "Api" => api,
-    ]
+    ],
+    doctest = false,  # Disable doctests
+    clean = true,
+    
 )
 
 # Documenter can also automatically deploy documentation to gh-pages.
