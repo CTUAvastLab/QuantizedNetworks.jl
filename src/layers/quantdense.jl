@@ -1,23 +1,8 @@
-@doc raw"""
-    QuantDense
-
+"""
 The `QuantDense` module defines a custom dense layer for neural networks that combines quantization and sparsity techniques for efficient inference. 
 This module includes various constructors and methods to create and utilize quantized dense layers.
 
-## Type Definition
-
-```julia
-struct QuantDense{F, M, B, Q1, S, Q2, N}
-    weight::M
-    bias::B
-    σ::F
-
-    weight_quantizer::Q1
-    weight_sparsifier::S
-    output_quantizer::Q2
-    batchnorm::N
-end
-```
+## Constructor
 
 - weight (learnable weights used for the dense layer)
 - bias (learnable biases used for the dense layer)
@@ -27,12 +12,8 @@ end
 - output_quantizer (output quantization function)
 - batchnorm (optional batch normalization layer)
 
-## Functions
+## Functor
 
-```julia
-function (l::QuantDense)(x::AbstractVecOrMat)
-function (l::QuantDense)(x::AbstractArray)
-```
 `QuantDense` serves as a functor and it applies the  layer to the input data x.
 It performs quantization of weights, sparsification, batch normalization (if enabled), and output quantization.
 If necessary the function resahpes the input.
@@ -52,38 +33,6 @@ qd = QuantDense(1 => 2, identity; kwargs...)
 
 qd(x)
 ```
-
-```julia
-function nn2logic(layer::QuantDense)
-```
-
-This function converts a QuantDense layer to a logic-compatible layer by applying the weight quantization and sparsification techniques.
-It returns a Dense layer suitable for efficient inference.
-
-## Examples
-
-```jldoctest
-julia> using Random; Random.seed!(3);
-
-julia> x = rand(Float32, 1, 2);
-
-julia> qd = QuantDense(1 => 2)
-QuantDense(1 => 2, identity; weight_lims=(-1.0f0, 1.0f0), bias=false, Ternary(0.05, STE(2)), Sign(STE(2)))
-
-julia> qd(x)
-2×2 Matrix{Float32}:
- -1.0  -1.0
-  1.0   1.0
-
-julia> d = QuantizedNetworks.nn2logic(qd)
-Dense(1 => 2, Sign(STE(2)))  # 4 parameters
-
-julia> d([3])
-2-element Vector{Float32}:
- -1.0
-  1.0
-```
-
 """
 struct QuantDense{F, M, B, Q1, S, Q2, N}
     weight::M
@@ -179,6 +128,10 @@ function Base.show(io::IO, l::QuantDense)
     print(io, "; ", join(kwargs, ", "), ")")
 end
 
+"""
+This function converts a QuantDense layer to a logic-compatible layer by applying the weight quantization and sparsification techniques.
+It returns a Dense layer suitable for efficient inference.
+"""
 function nn2logic(layer::QuantDense)
     bn = layer.batchnorm
     W = layer.weight_quantizer(layer.weight)
