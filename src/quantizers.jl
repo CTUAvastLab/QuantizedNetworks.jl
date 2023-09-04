@@ -1,6 +1,4 @@
-@doc raw"""
-    AbstractQuantizer
-
+"""
 Quantizers are used to limit the range of possible numerical values. 
 Useful for quantizing neural networks, to work on hardware with limited computational resources.
 

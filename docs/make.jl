@@ -19,7 +19,8 @@ api = joinpath.("./api/", [
     "estimators.md",
     "quantizers.md",
     "layers.md",
-    "blocks.md"
+    "blocks.md",
+    "l0gate.md"
 ])
 
 makedocs(

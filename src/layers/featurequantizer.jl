@@ -1,4 +1,4 @@
-@doc raw"""
+"""
 The `FeatureQuantizer` module defines a struct and associated functions for feature quantization within a neural network. 
 Feature quantization involves discretizing input features using learnable weights and biases, and applying an output quantization function.
 
