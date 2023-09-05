@@ -24,6 +24,11 @@ api = joinpath.("./api/", [
     "optimizers.md"
 ])
 
+examples = joinpath.("./examples/", [
+    "mnist.md",
+    "flower.md"
+])
+
 makedocs(
     sitename = "QuantizedNetworks",
     format = Documenter.HTML(prettyurls=false),
@@ -31,8 +36,9 @@ makedocs(
     pages = [
         "Home" => "index.md",
         "Api" => api,
+        "Examples" => examples
     ],
-    doctest = false,  # Disable doctests
+    doctest = true,  # Disable doctests
     clean = true,
     
 )
