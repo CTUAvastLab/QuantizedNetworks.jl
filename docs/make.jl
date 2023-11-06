@@ -1,6 +1,5 @@
-push!(LOAD_PATH,"../src/")
-push!(LOAD_PATH,"../src/blocks/")
-push!(LOAD_PATH,"../src/layers/")
+using Pkg
+Pkg.develop(path = "../")
 
 using Documenter
 using QuantizedNetworks
@@ -31,21 +30,22 @@ examples = joinpath.("./examples/", [
 
 makedocs(
     sitename = "QuantizedNetworks",
-    format = Documenter.HTML(prettyurls=false),
+    format=Documenter.HTML(;
+        prettyurls=get(ENV, "CI", "false") == "true",
+        collapselevel=1,
+        ansicolor=true
+    ),
     modules = [QuantizedNetworks],
     pages = [
         "Home" => "index.md",
+        "Examples" => examples,
         "Api" => api,
-        "Examples" => examples
     ],
     doctest = true,  # Disable doctests
     clean = true,
-    
+
 )
 
-# Documenter can also automatically deploy documentation to gh-pages.
-# See "Hosting Documentation" and deploydocs() in the Documenter manual
-# for more information.
-#=deploydocs(
-    repo = "<repository url>"
-)=#
+deploydocs(;
+    repo="github.com/CTUAvastLab/QuantizedNetworks.git"
+)
