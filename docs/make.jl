@@ -44,5 +44,5 @@ makedocs(
 )
 
 deploydocs(;
-    repo="github.com/CTUAvastLab/QuantizedNetworks.git"
+    repo="github.com/CTUAvastLab/QuantizedNetworks.jl.git"
 )
