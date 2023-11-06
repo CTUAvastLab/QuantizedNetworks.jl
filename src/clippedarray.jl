@@ -1,8 +1,10 @@
-"""
+@doc raw"""
     ClippedArray(x::AbstractArray, lo::Real=-1, hi::Real=1)
     ClippedArray(dims...; lo::Real=-1, hi::Real=1, init = glorot_uniform)
 
-Array type with elements clipped between `lo` and `hi`, defaults to [-1, +1].
+Represents an Array type with elements clipped between `lo` and `hi`, if nothing is set range defaults to [-1, +1]. 
+It still works in the case that `hi` is less then `lo`.
+Supports all standard Array type operations and functions, as well there are type aliases for 2D and 3D arrays (i.e. ClippedVector, ClippedMatrix).
 
 # Examples
 
