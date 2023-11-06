@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>MNIST Example · QuantizedNetworks</title><meta name="title" content="MNIST Example · QuantizedNetworks"/><meta property="og:title" content="MNIST Example · QuantizedNetworks"/><meta property="twitter:title" content="MNIST Example · QuantizedNetworks"/><meta name="description" content="Documentation for QuantizedNetworks."/><meta property="og:description" content="Documentation for QuantizedNetworks."/><meta property="twitter:description" content="Documentation for QuantizedNetworks."/><script data-outdated-warner src="../../assets/warner.js"></script><link href="https://cdnjs.cloudflare.com/ajax/libs/lato-font/3.0.0/css/lato-font.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/juliamono/0.050/juliamono.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/fontawesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/solid.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/brands.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.8/katex.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL="../.."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" data-main="../../assets/documenter.js"></script><script src="../../search_index.js"></script><script src="../../siteinfo.js"></script><script src="../../../versions.js"></script><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/documenter-dark.css" data-theme-name="documenter-dark" data-theme-primary-dark/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/documenter-light.css" data-theme-name="documenter-light" data-theme-primary/><script src="../../assets/themeswap.js"></script></head><body><div id="documenter"><nav class="docs-sidebar"><div class="docs-package-name"><span class="docs-autofit"><a href="../../">QuantizedNetworks</a></span></div><button class="docs-search-query input is-rounded is-small is-clickable my-2 mx-auto py-1 px-2" id="documenter-search-query">Search docs (Ctrl + /)</button><ul class="docs-menu"><li><a class="tocitem" href="../../">Home</a></li><li><input class="collapse-toggle" id="menuitem-2" type="checkbox" checked/><label class="tocitem" for="menuitem-2"><span class="docs-label">Examples</span><i class="docs-chevron"></i></label><ul class="collapsed"><li class="is-active"><a class="tocitem" href>MNIST Example</a><ul class="internal"><li><a class="tocitem" href="#Create-a-project"><span>Create a project</span></a></li><li><a class="tocitem" href="#Utilities"><span>Utilities</span></a></li><li><a class="tocitem" href="#Create-a-model"><span>Create a model</span></a></li><li><a class="tocitem" href="#Train-a-model"><span>Train a model</span></a></li></ul></li><li><a class="tocitem" href="../flower/">Flower Example</a></li></ul></li><li><input class="collapse-toggle" id="menuitem-3" type="checkbox"/><label class="tocitem" for="menuitem-3"><span class="docs-label">Api</span><i class="docs-chevron"></i></label><ul class="collapsed"><li><a class="tocitem" href="../../api/utilities/">Utilities</a></li><li><a class="tocitem" href="../../api/estimators/">Estimators</a></li><li><a class="tocitem" href="../../api/quantizers/">Quantizers</a></li><li><a class="tocitem" href="../../api/layers/">Layers</a></li><li><a class="tocitem" href="../../api/blocks/">Blocks</a></li><li><a class="tocitem" href="../../api/l0gate/">L0 gate</a></li><li><a class="tocitem" href="../../api/optimizers/">Optimizers</a></li></ul></li></ul><div class="docs-version-selector field has-addons"><div class="control"><span class="docs-label button is-static is-size-7">Version</span></div><div class="docs-selector control is-expanded"><div class="select is-fullwidth is-size-7"><select id="documenter-version-selector"></select></div></div></div></nav><div class="docs-main"><header class="docs-navbar"><a class="docs-sidebar-button docs-navbar-link fa-solid fa-bars is-hidden-desktop" id="documenter-sidebar-button" href="#"></a><nav class="breadcrumb"><ul class="is-hidden-mobile"><li><a class="is-disabled">Examples</a></li><li class="is-active"><a href>MNIST Example</a></li></ul><ul class="is-hidden-tablet"><li class="is-active"><a href>MNIST Example</a></li></ul></nav><div class="docs-right"><a class="docs-navbar-link" href="https://github.com/CTUAvastLab/QuantizedNetworks.jl" title="View the repository on GitHub"><span class="docs-icon fa-brands"></span><span class="docs-label is-hidden-touch">GitHub</span></a><a class="docs-navbar-link" href="https://github.com/CTUAvastLab/QuantizedNetworks.jl/blob/main/docs/src/examples/mnist.md" title="Edit source on GitHub"><span class="docs-icon fa-solid"></span></a><a class="docs-settings-button docs-navbar-link fa-solid fa-gear" id="documenter-settings-button" href="#" title="Settings"></a><a class="docs-article-toggle-button fa-solid fa-chevron-up" id="documenter-article-toggle-button" href="javascript:;" title="Collapse all docstrings"></a></div></header><article class="content" id="documenter-page"><h1 id="MNIST-Example"><a class="docs-heading-anchor" href="#MNIST-Example">MNIST Example</a><a id="MNIST-Example-1"></a><a class="docs-heading-anchor-permalink" href="#MNIST-Example" title="Permalink"></a></h1><p>The MNIST dataset is a widely recognized collection of handwritten digits used for training and benchmarking machine learning models.  Following example demonstrates a use case of QuantizedNeteorks package and discrete neural networks on a problem of classifying handwritten digits.</p><h2 id="Create-a-project"><a class="docs-heading-anchor" href="#Create-a-project">Create a project</a><a id="Create-a-project-1"></a><a class="docs-heading-anchor-permalink" href="#Create-a-project" title="Permalink"></a></h2><p>Create a Julia project and add following dependecies</p><ul><li>MLDatasets </li><li>QuantizedNetworks </li><li>Plots </li><li>NuLog </li><li>ProgressMeter </li><li>StatsBase </li></ul><h2 id="Utilities"><a class="docs-heading-anchor" href="#Utilities">Utilities</a><a id="Utilities-1"></a><a class="docs-heading-anchor-permalink" href="#Utilities" title="Permalink"></a></h2><p>As it is needed to process and prepare data to be used in traing a network, it is best to create a file for all the helper functions called utilities.jl</p><h3 id="Packages"><a class="docs-heading-anchor" href="#Packages">Packages</a><a id="Packages-1"></a><a class="docs-heading-anchor-permalink" href="#Packages" title="Permalink"></a></h3><p>After creating the file include the following packages and their respective functions to the file.</p><pre><code class="language-julia hljs">using QuantizedNetworks
+using QuantizedNetworks.Flux
+using MLDatasets
+using ProgressMeter
+
+using QuantizedNetworks.Flux.Data: DataLoader
+using QuantizedNetworks.Flux: onehotbatch, onecold
+using QuantizedNetworks.Flux.Losses: logitcrossentropy, mse
+using QuantizedNetworks.Flux.Optimise: update!</code></pre><h3 id="Streamlining-dependecies"><a class="docs-heading-anchor" href="#Streamlining-dependecies">Streamlining dependecies</a><a id="Streamlining-dependecies-1"></a><a class="docs-heading-anchor-permalink" href="#Streamlining-dependecies" title="Permalink"></a></h3><p>In this case it is best to set the environment variable <code>DATADEPS_ALWAYS_ACCEPT</code> to <code>true</code> in order to streamline and automate the management of data dependencies during the execution of a Julia script or program. By doing this, it bypasses any prompts or user interactions that might otherwise occur when data dependencies need to be fetched or updated.</p><pre><code class="language-julia hljs">ENV[&quot;DATADEPS_ALWAYS_ACCEPT&quot;] = &quot;true&quot;</code></pre><div class="admonition is-info"><header class="admonition-header">Note</header><div class="admonition-body"><p>This practice is useful in automated scripts or when you want to ensure that your Julia program runs without interruption. However, it is important to exercise caution and only use this approach when you are confident about the data dependencies your code relies on, as it bypasses potential prompts that could help prevent unintended changes to your data.</p></div></div><h3 id="Data-loading"><a class="docs-heading-anchor" href="#Data-loading">Data loading</a><a id="Data-loading-1"></a><a class="docs-heading-anchor-permalink" href="#Data-loading" title="Permalink"></a></h3><p>Create a function to work with <code>MNIST</code> dataset and a desired batchsize, in order to preprocess the data and prepare it for training.</p><pre><code class="language-julia hljs">function createloader(dataset = MLDatasets.MNIST; batchsize::Int = 256)
+    xtrain, ytrain = dataset(:train)[:]
+    train_loader = DataLoader(
+        (Flux.flatten(xtrain), onehotbatch(ytrain, 0:9));
+        batchsize,
+        shuffle=true,
+    )
+
+    xtest, ytest = dataset(:test)[:]
+    test_loader = DataLoader(
+        (Flux.flatten(xtest), onehotbatch(ytest, 0:9));
+        batchsize,
+    )
+    return train_loader, test_loader
+end</code></pre><pre><code class="nohighlight hljs">createloader (generic function with 2 methods)</code></pre><h3 id="Accuracy-measure"><a class="docs-heading-anchor" href="#Accuracy-measure">Accuracy measure</a><a id="Accuracy-measure-1"></a><a class="docs-heading-anchor-permalink" href="#Accuracy-measure" title="Permalink"></a></h3><p>Add a function to calculate the accuracy of model predictions versus the data.</p><pre><code class="language-julia hljs">function accuracy(data_loader, model)
+    acc = 0
+    num = 0
+    for (x, y) in data_loader
+        acc += sum(onecold(model(x)) .== onecold(y))
+        num += size(x)[end]
+    end
+    return acc / num
+end</code></pre><pre><code class="nohighlight hljs">accuracy (generic function with 1 method)</code></pre><h3 id="Training"><a class="docs-heading-anchor" href="#Training">Training</a><a id="Training-1"></a><a class="docs-heading-anchor-permalink" href="#Training" title="Permalink"></a></h3><p>Add a function to simplify the training of a model.</p><pre><code class="language-julia hljs">function train_model(model, opt, train, test; loss = logitcrossentropy, epochs::Int = 30)
+    p = Progress(epochs, 1)
+    ps = Flux.params(model)
+    history = (
+        train_acc = [accuracy(train, model)],
+        test_acc = [accuracy(test, model)],
+    )
+
+    for _ in 1:epochs
+        for (x, y) in train
+            gs = gradient(() -&gt; loss(model(x), y), ps)
+            update!(opt, ps, gs)
+        end
+
+        # compute accuracy
+        push!(history.train_acc, accuracy(train, model))
+        push!(history.test_acc, accuracy(test, model))
+
+        # print progress
+        showvalues = [
+            (:acc_train_0, round(100 * history.train_acc[1]; digits = 2)),
+            (:acc_train, round(100 * history.train_acc[end]; digits = 2)),
+            (:acc_test_0, round(100 * history.test_acc[1]; digits = 2)),
+            (:acc_test, round(100 * history.test_acc[end]; digits = 2)),
+        ]
+        ProgressMeter.next!(p; showvalues)
+    end
+    return history
+end</code></pre><pre><code class="nohighlight hljs">train_model (generic function with 1 method)</code></pre><h2 id="Create-a-model"><a class="docs-heading-anchor" href="#Create-a-model">Create a model</a><a id="Create-a-model-1"></a><a class="docs-heading-anchor-permalink" href="#Create-a-model" title="Permalink"></a></h2><h3 id="Dependecies"><a class="docs-heading-anchor" href="#Dependecies">Dependecies</a><a id="Dependecies-1"></a><a class="docs-heading-anchor-permalink" href="#Dependecies" title="Permalink"></a></h3><p>Now create a julia script that will perform the training of neural networks.</p><p>Start by adding the required packages, activating the current project and including the <code>utilities.jl</code> file.</p><pre><code class="language-julia hljs">using Pkg
+Pkg.activate(@__DIR__)
+
+using Revise
+using QuantizedNetworks
+using Plots
+using Random
+
+include(joinpath(@__DIR__, &quot;utilities.jl&quot;))</code></pre><div class="admonition is-info"><header class="admonition-header">Note</header><div class="admonition-body"><p>It is necessary to activate the project yo set the active project environment to be the one located in the directory where the script or notebook is executed, not the global environment.</p></div></div><h3 id="Load-data"><a class="docs-heading-anchor" href="#Load-data">Load data</a><a id="Load-data-1"></a><a class="docs-heading-anchor-permalink" href="#Load-data" title="Permalink"></a></h3><p>Set the seed for generating random numers (in order to be able to replicate the results) and call the createloader function to load the training and testing datasets. It is also usefull to prepare the dimensions of the architecture of a neural network with 3 layers (input, hidden and output).</p><pre><code class="language-julia hljs">Random.seed!(1234)
+dataset = MNIST
+train, test = createloader(dataset; batchsize = 256)
+
+input_size = size(first(train)[1], 1)
+nclasses = size(first(train)[2], 1)
+nhidden = 256</code></pre><h3 id="Standard-model"><a class="docs-heading-anchor" href="#Standard-model">Standard model</a><a id="Standard-model-1"></a><a class="docs-heading-anchor-permalink" href="#Standard-model" title="Permalink"></a></h3><p>Create a standard <code>Flux.jl</code> model to have as a reference to compare the discrete version performance to.</p><pre><code class="language-julia hljs">model = Chain(
+    Dense(input_size =&gt; nhidden, relu),
+    Dense(nhidden =&gt; nclasses),
+)</code></pre><pre><code class="nohighlight hljs">Chain(
+  Dense(784 =&gt; 256, relu),              # 200_960 parameters
+  Dense(256 =&gt; 10),                     # 2_570 parameters
+)                   # Total: 4 arrays, 203_530 parameters, 795.289 KiB.</code></pre><h3 id="Binary-model"><a class="docs-heading-anchor" href="#Binary-model">Binary model</a><a id="Binary-model-1"></a><a class="docs-heading-anchor-permalink" href="#Binary-model" title="Permalink"></a></h3><p>Use the hard hyperbolic tangent function as the activation function. As there are a lot of keyword arguments it is best to create a separate <code>NamedTuple</code> to make it easier to read and understand.</p><h4 id="Hyperparameters"><a class="docs-heading-anchor" href="#Hyperparameters">Hyperparameters</a><a id="Hyperparameters-1"></a><a class="docs-heading-anchor-permalink" href="#Hyperparameters" title="Permalink"></a></h4><pre><code class="language-julia hljs">σ = hardtanh
+kwargs = (;
+    init = (dims...) -&gt; ClippedArray(dims...; lo = -1, hi = 1),
+    output_quantizer = Sign(),
+    batchnorm = true,
+)</code></pre><pre><code class="nohighlight hljs">(init = var&quot;#15#16&quot;(), output_quantizer = Sign(STE(2)), batchnorm = true)</code></pre><p>Explanation:</p><ul><li>init: It takes a function to initialise the weight matrix, in this case it is an anonymus function that takes <code>n</code> dimensions and creates an n-dimensional ClippedArray which is clamped in the range <code>[-1, 1]</code></li><li>For other arguments look up <a href="../../api/layers/#QuantizedNetworks.QuantDense"><code>QuantDense</code></a></li></ul><h4 id="Model"><a class="docs-heading-anchor" href="#Model">Model</a><a id="Model-1"></a><a class="docs-heading-anchor-permalink" href="#Model" title="Permalink"></a></h4><p>Now create a binary model. It will have two <code>QuantDense</code> layers, but it will be preceded by a layer that is defined as a anonymus function that will only transform the input values to binary values <span>${-1, 1}$</span>. In other words it will qunatize the input features of data.</p><pre><code class="language-julia hljs">model_bin = Chain(
+    x -&gt; Float32.(ifelse.(x .&gt; 0, 1, -1)),
+    QuantDense(input_size =&gt; nhidden, σ; kwargs...),
+    QuantDense(nhidden =&gt; nclasses; kwargs...),
+)</code></pre><pre><code class="nohighlight hljs">Chain(
+  var&quot;#17#18&quot;(),
+  QuantDense(
+    Float32[-0.028019346 -0.047897033 … -0.06890707 0.05361874; -0.0464801 -0.02306688 … -0.02808203 -0.0005326818; … ; -0.06333841 0.0009912428 … -0.0015381856 -0.06842575; -0.036003914 -0.03693979 … -0.03655994 0.057226446],  # 200_704 parameters
+    false,
+    identity,
+    Ternary(0.05, STE(2)),
+    identity,
+    Sign(STE(2)),
+    BatchNorm(256, hardtanh),           # 512 parameters, plus 512
+  ),
+  QuantDense(
+    Float32[0.13371286 -0.13981822 … -0.13812053 -0.11148539; 0.12859496 -0.030631518 … -0.045713615 0.1391876; … ; -0.06140963 0.1481502 … -0.001152252 -0.046711177; -0.128069 -0.11804912 … 0.08063337 -0.14401688],  # 2_560 parameters
+    false,
+    identity,
+    Ternary(0.05, STE(2)),
+    identity,
+    Sign(STE(2)),
+    BatchNorm(10),                      # 20 parameters, plus 20
+  ),
+)         # Total: 6 trainable arrays, 203_796 parameters,
+          # plus 4 non-trainable, 532 parameters, summarysize 798.969 KiB.</code></pre><h2 id="Train-a-model"><a class="docs-heading-anchor" href="#Train-a-model">Train a model</a><a id="Train-a-model-1"></a><a class="docs-heading-anchor-permalink" href="#Train-a-model" title="Permalink"></a></h2><p>Define a desired number of epochs, the loss function and run the training of two models, by calling the <code>train_model</code>. function from <code>utilities.jl</code> It will take a few minutes to complete.</p><pre><code class="language-julia hljs">epochs = 15
+loss = logitcrossentropy
+
+history = train_model(model, AdaBelief(), train, test; epochs, loss)
+history_bin = train_model(model_bin, AdaBelief(), train, test; epochs, loss)</code></pre><pre><code class="nohighlight hljs">(train_acc = [0.10143333333333333, 0.6454, 0.8493, 0.91595, 0.92225, 0.9266166666666666, 0.9364166666666667, 0.9343, 0.9495, 0.94765, 0.9584666666666667, 0.9565333333333333, 0.959, 0.9600666666666666, 0.95585, 0.9612833333333334], test_acc = [0.1026, 0.6464, 0.8468, 0.9075, 0.9137, 0.9159, 0.9288, 0.9228, 0.9336, 0.9336, 0.944, 0.9423, 0.9405, 0.9376, 0.9358, 0.9456])</code></pre><h3 id="Plot-the-results"><a class="docs-heading-anchor" href="#Plot-the-results">Plot the results</a><a id="Plot-the-results-1"></a><a class="docs-heading-anchor-permalink" href="#Plot-the-results" title="Permalink"></a></h3><p>Plot the results to compare the two models and make further adjustments to the hyperparametars.</p><pre><code class="language-julia hljs">plt1 = plot(history.train_acc; label = &quot;normal model&quot;, title = &quot;Train $(dataset)&quot;);
+plot!(plt1, history_bin.train_acc; label = &quot;binary model&quot;);
+
+plt2 = plot(history.test_acc; label = &quot;normal model&quot;, title = &quot;Test $(dataset)&quot;);
+plot!(plt2, history_bin.test_acc; label = &quot;binary model&quot;);
+
+plt = plot(
+    plt1,
+    plt2;
+    layout = (2, 1),
+    size = (600, 800),
+    ylims = (0, 1),
+    xlabel = &quot;epoch&quot;,
+    ylabel = &quot;accuracy (%)&quot;,
+    legend = :bottomright
+)
+
+savefig(plt, &quot;$(dataset).png&quot;)</code></pre></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../../">« Home</a><a class="docs-footer-nextpage" href="../flower/">Flower Example »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="auto">Automatic (OS)</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.1.2 on <span class="colophon-date" title="Monday 6 November 2023 18:12">Monday 6 November 2023</span>. Using Julia version 1.9.3.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
