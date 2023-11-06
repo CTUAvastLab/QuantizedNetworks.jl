@@ -1,6 +1,3 @@
-using Pkg
-Pkg.develop(path = "../")
-
 using Documenter
 using QuantizedNetworks
 
