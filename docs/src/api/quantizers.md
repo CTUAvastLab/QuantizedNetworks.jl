@@ -4,11 +4,13 @@ QuantizedNetworks.AbstractQuantizer
 QuantizedNetworks.forward_pass(q::AbstractQuantizer, x)
 QuantizedNetworks.pullback(q::AbstractQuantizer, x)
 ```
+
 ## Binary
 ```@docs
 QuantizedNetworks.Sign
 QuantizedNetworks.Heaviside
 ```
+
 ## Ternary
 ```@docs
 QuantizedNetworks.Ternary

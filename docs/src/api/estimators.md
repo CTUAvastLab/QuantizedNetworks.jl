@@ -2,7 +2,8 @@
 ```@docs
 QuantizedNetworks.AbstractEstimator
 ```
-## Straight through estimator
+
+## Straight through estimators
 ```@docs
 QuantizedNetworks.STE
 QuantizedNetworks.PolynomialSTE
