@@ -70,7 +70,7 @@ savefig(plt, "$(dataset).png")
 # using NuLog
 # input = train.data[1][:,1]
 # input = round.(Int, (2 .* input .- 1))
-# r = NuLog.Input11()
+# r = NuLog.Logic11()
 # output = model(input)
 # p = NuLog.MatchSoftmax(output)
 # e = NuLog.backward_explanation(r, model_bin, input, p)

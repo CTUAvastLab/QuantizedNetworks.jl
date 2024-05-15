@@ -25,7 +25,7 @@ function generate_flower(n, npetals = 8)
         )
 	end
 	y = mapreduce(i -> fill(i, n), vcat, 1:npetals)
-	return x, y
+	return Float32.(x), y
 end
 
 function createloader(n::Int, n_test::Int = n; batchsize::Int = 100, npetals = 8)
@@ -84,29 +84,4 @@ function train_model(model, opt, train, test; loss = logitcrossentropy, epochs::
         ProgressMeter.next!(p; showvalues)
     end
     return history
-end
-
-# plots
-function plot_decision(model, data; k::Int = 100, kwargs...)
-    x, y = data
-    labels = sort(unique(onecold(y)))
-    lims = extrema(x; dims = 2)
-    xs = range((lims[1] .+ (-1, 1))...; length = k)
-    ys = range((lims[2] .+ (-1, 1))...; length = k)
-    color = collect(palette(:tab10))[1:length(labels)]
-
-    plt = heatmap(
-        xs,
-        ys,
-        (x, y) -> onecold(model(reshape([x; y], :, 1)), labels)[1];
-        label = "",
-        opacity = 0.6,
-        axis = false,
-        ticks = false,
-        cbar = false,
-        color = color,
-        kwargs...,
-    )
-    scatter!(plt, x[1, :], x[2, :]; label = "", color = color[onecold(y, labels)])
-    return plt
 end
