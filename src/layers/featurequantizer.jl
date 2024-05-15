@@ -1,3 +1,14 @@
+"""
+The `FeatureQuantizer` module defines a struct and associated functions for feature quantization within a neural network. 
+Feature quantization involves discretizing input features using learnable weights and biases, and applying an output quantization function.
+
+```julia
+function (q::FeatureQuantizer)(x)
+```
+
+`FeatureQuantizer` serves as a functor and it applies the feature quantization operation to the input data x 
+using the weights and biases stored in the FeatureQuantizer object and returns the quantized output.
+"""
 struct FeatureQuantizer{M<:AbstractMatrix, B, Q}
     weight::M
     bias::B
@@ -36,6 +47,16 @@ function (q::FeatureQuantizer)(x)
     return q.output_quantizer(y)
 end
 
+
+function _forward_pass(w, b, x::AbstractVector)
+    return vec(_forward_pass(w, b, reshape(x, length(x), 1)))
+end
+
+"""
+This is an internal function and performs the forward pass of the feature quantization layer for input data with multiple dimensions.
+It computes the weighted sum of input data, applies biases, and quantizes the result. 
+There is also a version for supplying one-dimensional input vector.
+"""
 function _forward_pass(w, b, x)
     w1, b1, x1 = size(w, 1), size(b, 1), size(x, 1)
     if !(w1 == b1 == x1)
@@ -52,12 +73,26 @@ function _forward_pass(w, b, x)
     return y
 end
 
+"""
+This function defines the reverse-mode automatic differentiation (AD) rule for the `_forward_pass` function.
+It specifies how gradients are propagated backward through the quantization layer during backpropagation.
+    
+- `project_w`: A function to project the gradient with respect to weights.
+- `project_b`: A function to project the gradient with respect to biases.
+- `project_x`: A function to project the gradient with respect to input data.
+
+This function returns a tuple containing gradients with respect to weights, biases, and input data, along with the projected gradients for each.
+
+This internal function is used for reverse-mode AD during backpropagation. 
+It computes gradients for the feature quantization layer and returns the gradients for weights, biases, and input data.
+Δy is the gradient with respect to the output.
+"""
 function ChainRulesCore.rrule(::typeof(_forward_pass), w, b, x)
     project_w = ProjectTo(w)
     project_b = ProjectTo(b)
     project_x = ProjectTo(x)
 
-    function FeatureQuantizer_pullback(Δy)
+    function r_pullback(Δy)
         Δw, Δb, Δx = zero.((w, b, x))
 
         for col in axes(x, 2)

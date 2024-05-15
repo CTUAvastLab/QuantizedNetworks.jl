@@ -1,5 +1,3 @@
-push!(LOAD_PATH,"../src/")
-
 using Documenter
 using QuantizedNetworks
 
@@ -14,23 +12,37 @@ DocMeta.setdocmeta!(
 # content
 api = joinpath.("./api/", [
     "utilities.md",
+    "estimators.md",
     "quantizers.md",
     "layers.md",
+    "blocks.md",
+    "l0gate.md",
+    "optimizers.md"
+])
+
+examples = joinpath.("./examples/", [
+    "mnist.md",
+    "flower.md"
 ])
 
 makedocs(
     sitename = "QuantizedNetworks",
-    format = Documenter.HTML(),
+    format=Documenter.HTML(;
+        prettyurls=get(ENV, "CI", "false") == "true",
+        collapselevel=1,
+        ansicolor=true
+    ),
     modules = [QuantizedNetworks],
     pages = [
         "Home" => "index.md",
+        "Examples" => examples,
         "Api" => api,
-    ]
+    ],
+    doctest = true,  # Disable doctests
+    clean = true,
+
 )
 
-# Documenter can also automatically deploy documentation to gh-pages.
-# See "Hosting Documentation" and deploydocs() in the Documenter manual
-# for more information.
-#=deploydocs(
-    repo = "<repository url>"
-)=#
+deploydocs(;
+    repo="github.com/CTUAvastLab/QuantizedNetworks.jl.git"
+)

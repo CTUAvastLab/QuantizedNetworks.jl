@@ -1,3 +1,19 @@
+"""
+The `DenseBlock` module defines a custom block structure for neural networks.
+It consists of a chain of layers, making it suitable for creating dense blocks in deep neural networks.
+Encapsulates functionality for quantized dense layers, batch normalization, and output quantization.
+It is defined to be a functor object.
+
+## Constructor
+Constructor creates a DenseBlock object containing a chain of layers.
+It takes several optional arguments:
+- (in, out) specifies the input and output dimensions.
+- σ is an activation function (default is the identity function).
+- weight_quantizer sets the quantizer for weights (default is a ternary quantizer).
+- output_quantizer sets the quantizer for the layer's output (default is a sign quantizer).
+- batchnorm determines whether batch normalization is applied (default is true).
+It constructs a chain of layers including a quantized dense layer, optional batch normalization, and an output quantizer.
+"""
 struct DenseBlock <: AbstractBlock
     layers
 end
@@ -30,6 +46,16 @@ extract_dense(l::DenseBlock) = l.layers[1]
 extract_batchnorm(l::DenseBlock) = l.layers[2]
 extract_quantizer(l::DenseBlock) = l.layers[3]
 
+
+"""
+This function is overwritten from the `Flux` package converts a `DenseBlock` into a standard dense layer `Flux.Dense`
+with quantized weights, adjusted biases, and the specified output quantization.
+
+Extractors serve the purpose of extracting specific components from a `DenseBlock` like:
+- `extract_dense` for quantized dense layer.
+- `extract_batchnorm` for the optional batch normalization layer.
+- `extract_quantizer` for the output quantization function.
+"""
 function Flux.Dense(l::DenseBlock)
     d = extract_dense(l)
     bn = extract_batchnorm(l)
